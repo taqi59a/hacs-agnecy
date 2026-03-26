@@ -22,4 +22,4 @@ jobs:
           remote_user: ${{ secrets.SSH_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
-          remote_port: ${{ secrets.SSH_PORT }}
+          remote_port: 21098
