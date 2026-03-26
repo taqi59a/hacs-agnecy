@@ -17,10 +17,9 @@ jobs:
         with:
           switches: -avzr --delete
           path: ./ 
-          # This path uses your exact username and addon domain folder
           remote_path: /home/congwfvq/hacs-agency.com/
           remote_host: ${{ secrets.SSH_HOST }}
           remote_user: ${{ secrets.SSH_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
-          remote_port: 21098
+          remote_port: ${{ secrets.SSH_PORT }}
