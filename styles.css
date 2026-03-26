@@ -164,6 +164,22 @@ h1 {
   padding: 4rem 0;
 }
 
+.reveal {
+  animation: riseIn 700ms ease both;
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .alt {
   background: var(--white);
   border-top: 1px solid #dce6f0;
@@ -239,6 +255,62 @@ h2 {
   font-size: 2rem;
 }
 
+.timeline-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.timeline-grid article {
+  background: var(--white);
+  border: 1px solid #cbe0f2;
+  border-radius: 0.85rem;
+  padding: 1rem;
+}
+
+.timeline-grid h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--gray-900);
+}
+
+.testimonials {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.testimonials blockquote {
+  margin: 0;
+  background: linear-gradient(165deg, #f5fbff, #ffffff);
+  border: 1px solid #cfe6f8;
+  border-radius: 0.85rem;
+  padding: 1rem;
+  font-weight: 500;
+}
+
+.testimonials cite {
+  display: block;
+  margin-top: 0.75rem;
+  font-style: normal;
+  color: var(--blue-600);
+  font-weight: 700;
+}
+
+.cta-strip {
+  background: linear-gradient(90deg, #d7ecfb, #ecf7ff);
+  border-top: 1px solid #bfdcf4;
+  border-bottom: 1px solid #bfdcf4;
+}
+
+.cta-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cta-content h2 {
+  margin: 0;
+}
+
 .contact-form {
   margin-top: 1rem;
   display: grid;
@@ -298,5 +370,9 @@ footer {
 
   .hero-content {
     grid-template-columns: 1fr;
+  }
+
+  .cta-content {
+    align-items: flex-start;
   }
 }
