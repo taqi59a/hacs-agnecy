@@ -5,27 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HACS Agency | Travel from Lubumbashi</title>
   <meta name="description" content="HACS Agency is a travel agency based in Lubumbashi offering tours, flights, and custom travel packages." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="page-glow" aria-hidden="true"></div>
   <header class="hero">
     <nav class="nav container">
       <div class="brand">HACS Agency</div>
       <ul>
         <li><a href="#services">Services</a></li>
-        <li><a href="#destinations">Destinations</a></li>
+        <li><a href="#packages">Packages</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
 
     <div class="hero-content container">
-      <p class="eyebrow">Based in Lubumbashi</p>
-      <h1>Discover Africa and Beyond with HACS Agency</h1>
-      <p class="lead">
-        We design memorable trips with trusted local guidance, smooth logistics,
-        and personalized itineraries for families, groups, and professionals.
-      </p>
-      <a class="btn" href="#contact">Plan Your Journey</a>
+      <div class="hero-copy">
+        <p class="eyebrow">Based in Lubumbashi, DRC</p>
+        <h1>Travel Planning That Feels Effortless and Exciting</h1>
+        <p class="lead">
+          HACS Agency builds smooth, reliable travel experiences for families,
+          professionals, and groups with local insight and global connections.
+        </p>
+        <div class="hero-actions">
+          <a class="btn" href="#contact">Plan Your Journey</a>
+          <a class="btn btn-light" href="#packages">View Packages</a>
+        </div>
+      </div>
+      <aside class="hero-panel" aria-label="Agency Highlights">
+        <p class="panel-title">Trusted by travelers across the region</p>
+        <ul>
+          <li><strong>24/7</strong> trip support</li>
+          <li><strong>500+</strong> successful bookings</li>
+          <li><strong>12+</strong> partner destinations</li>
+        </ul>
+      </aside>
     </div>
   </header>
 
@@ -35,29 +52,60 @@
       <div class="grid cards">
         <article class="card">
           <h3>Flight Booking</h3>
-          <p>Best-route flight options for regional and international travel.</p>
+          <p>Best-route flight options for regional and international travel with fare guidance.</p>
         </article>
         <article class="card">
           <h3>Hotel & Stay</h3>
-          <p>Comfortable and secure accommodation selections for every budget.</p>
+          <p>Comfortable, secure accommodation choices selected to match your schedule and budget.</p>
         </article>
         <article class="card">
           <h3>Custom Tours</h3>
-          <p>Curated experiences in DRC, Southern Africa, and global destinations.</p>
+          <p>Curated experiences in DRC, Southern Africa, and international destinations.</p>
+        </article>
+        <article class="card">
+          <h3>Business Travel</h3>
+          <p>Efficient itineraries for conferences, site visits, and executive travel needs.</p>
         </article>
       </div>
     </section>
 
-    <section id="destinations" class="section alt">
+    <section id="packages" class="section alt">
       <div class="container">
-        <h2>Popular Destinations</h2>
+        <h2>Featured Packages</h2>
         <div class="grid destinations">
-          <div class="tile">Lubumbashi City Tours</div>
-          <div class="tile">Zambia Weekends</div>
-          <div class="tile">Tanzania Safaris</div>
-          <div class="tile">Dubai Getaways</div>
+          <article class="tile">
+            <h3>Lubumbashi Explorer</h3>
+            <p>2 days city discovery, cultural stops, and private transport.</p>
+          </article>
+          <article class="tile">
+            <h3>Zambia Weekend</h3>
+            <p>Cross-border short trip with hotel booking and guided activities.</p>
+          </article>
+          <article class="tile">
+            <h3>Tanzania Safari</h3>
+            <p>Wildlife circuit with accommodation, flights, and transfers included.</p>
+          </article>
+          <article class="tile">
+            <h3>Dubai Escape</h3>
+            <p>Visa support, premium stay options, and curated city experiences.</p>
+          </article>
         </div>
       </div>
+    </section>
+
+    <section class="section container stats">
+      <article>
+        <h3>98%</h3>
+        <p>Client satisfaction rate on recent bookings.</p>
+      </article>
+      <article>
+        <h3>40+</h3>
+        <p>Corporate trips coordinated in the past year.</p>
+      </article>
+      <article>
+        <h3>15 min</h3>
+        <p>Average first response time for new inquiries.</p>
+      </article>
     </section>
 
     <section id="contact" class="section container">
@@ -81,7 +129,7 @@
   <footer>
     <div class="container footer-content">
       <strong>HACS Agency</strong>
-      <span>Travel Agency | Lubumbashi, DRC</span>
+      <span>Travel Agency | Lubumbashi, DRC | hacs-agency.com</span>
     </div>
   </footer>
 </body>

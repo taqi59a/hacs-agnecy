@@ -1,9 +1,12 @@
 :root {
-  --blue-50: #eef8ff;
+  --blue-50: #eff8ff;
+  --blue-100: #d8ecfb;
   --blue-300: #8ecdf5;
   --blue-600: #2b88c9;
-  --gray-100: #f3f5f7;
+  --gray-50: #fafbfc;
+  --gray-100: #f1f4f7;
   --gray-700: #334155;
+  --gray-900: #0f1d2f;
   --white: #ffffff;
 }
 
@@ -13,10 +16,22 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: var(--gray-700);
-  background: linear-gradient(180deg, var(--blue-50), var(--white) 38%, var(--gray-100));
+  background: linear-gradient(180deg, var(--blue-50), var(--white) 45%, var(--gray-100));
   line-height: 1.5;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.page-glow {
+  position: fixed;
+  inset: -10% auto auto -10%;
+  width: 48vw;
+  height: 48vw;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(142, 205, 245, 0.35), rgba(142, 205, 245, 0));
+  z-index: -1;
 }
 
 .container {
@@ -25,8 +40,8 @@ body {
 }
 
 .hero {
-  padding: 1.2rem 0 4rem;
-  background: radial-gradient(circle at top right, #cbe9ff, transparent 50%);
+  padding: 1.2rem 0 3.5rem;
+  background: radial-gradient(circle at top right, #cbe9ff, transparent 52%);
 }
 
 .nav {
@@ -36,9 +51,10 @@ body {
 }
 
 .brand {
-  font-size: 1.2rem;
+  font-size: 1.26rem;
   font-weight: 700;
   color: var(--blue-600);
+  letter-spacing: 0.01em;
 }
 
 .nav ul {
@@ -51,12 +67,20 @@ body {
 .nav a {
   text-decoration: none;
   color: var(--gray-700);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 
 .hero-content {
   margin-top: 3rem;
-  max-width: 700px;
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: 1.4fr 0.9fr;
+  align-items: end;
+}
+
+.hero-copy {
+  max-width: 720px;
 }
 
 .eyebrow {
@@ -67,13 +91,23 @@ body {
 }
 
 h1 {
+  font-family: "Sora", "Manrope", sans-serif;
   font-size: clamp(2rem, 5vw, 3.2rem);
   margin: 0.2rem 0 1rem;
+  color: var(--gray-900);
+  line-height: 1.18;
 }
 
 .lead {
   font-size: 1.1rem;
-  margin-bottom: 1.7rem;
+  margin-bottom: 1.3rem;
+  max-width: 64ch;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
 }
 
 .btn {
@@ -84,6 +118,46 @@ h1 {
   padding: 0.8rem 1.2rem;
   border-radius: 0.6rem;
   font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.btn:hover {
+  filter: brightness(1.04);
+}
+
+.btn-light {
+  background: var(--white);
+  color: var(--blue-600);
+  border-color: var(--blue-300);
+}
+
+.hero-panel {
+  background: linear-gradient(165deg, var(--white), var(--blue-50));
+  border: 1px solid #cce4f8;
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 18px 28px rgba(25, 91, 136, 0.08);
+}
+
+.panel-title {
+  margin: 0;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.hero-panel ul {
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.hero-panel li {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #d3e6f5;
+  padding-bottom: 0.3rem;
 }
 
 .section {
@@ -97,8 +171,10 @@ h1 {
 }
 
 h2 {
+  font-family: "Sora", "Manrope", sans-serif;
   font-size: 1.9rem;
   margin-top: 0;
+  color: var(--gray-900);
 }
 
 .grid {
@@ -114,7 +190,13 @@ h2 {
   background: var(--white);
   border: 1px solid #d9e8f5;
   border-radius: 0.8rem;
-  padding: 1rem;
+  padding: 1rem 1rem 0.9rem;
+  box-shadow: 0 12px 20px rgba(35, 97, 137, 0.06);
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
 }
 
 .destinations {
@@ -122,12 +204,39 @@ h2 {
 }
 
 .tile {
-  background: #e7f4ff;
+  background: linear-gradient(160deg, #e7f4ff, #f6fbff 62%);
   border: 1px solid #c7e4fa;
   border-radius: 0.8rem;
   padding: 1rem;
-  text-align: center;
-  font-weight: 600;
+}
+
+.tile h3 {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  color: var(--gray-900);
+}
+
+.tile p {
+  margin: 0;
+}
+
+.stats {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.stats article {
+  background: var(--gray-50);
+  border: 1px solid #d9e8f5;
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+
+.stats h3 {
+  margin: 0;
+  color: var(--blue-600);
+  font-size: 2rem;
 }
 
 .contact-form {
@@ -164,7 +273,7 @@ button {
 }
 
 footer {
-  background: #dfeffc;
+  background: #ddebfa;
   border-top: 1px solid #c7e1f6;
   padding: 1rem 0;
 }
@@ -185,5 +294,9 @@ footer {
   .nav ul {
     margin: 0.8rem 0 0;
     flex-wrap: wrap;
+  }
+
+  .hero-content {
+    grid-template-columns: 1fr;
   }
 }
