@@ -12,13 +12,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deploy via Rsync
-        uses: Burnett01/rsync-deployments@7.0.1
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          switches: -avzr --delete
-          path: ./ 
-          remote_path: /home/congwfvq/hacs-agency.com/
-          remote_host: 66.29.141.45
-          remote_user: congwfvq
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          remote_port: 21098
+          server: 66.29.141.45
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /home/congwfvq/hacs-agency.com/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
