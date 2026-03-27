@@ -1,179 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HACS Agency | Travel from Lubumbashi</title>
-  <meta name="description" content="HACS Agency is a travel agency based in Lubumbashi offering tours, flights, and custom travel packages." />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HACs — Flights from Lubumbashi | Best Fares Guaranteed</title>
+  <meta name="description" content="HACS Agency — Handling Aviation and Cargo Services. Book the cheapest flights from Lubumbashi (FBM) to Dubai, Mumbai, Karachi, Cape Town & more.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="page-glow" aria-hidden="true"></div>
-  <header class="hero">
-    <nav class="nav container">
-      <div class="brand">HACS Agency</div>
-      <ul>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#packages">Packages</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
 
-    <div class="hero-content container">
-      <div class="hero-copy">
-        <p class="eyebrow">Based in Lubumbashi, DRC</p>
-        <h1>Travel Planning That Feels Effortless and Exciting</h1>
-        <p class="lead">
-          HACS Agency builds smooth, reliable travel experiences for families,
-          professionals, and groups with local insight and global connections.
-        </p>
-        <div class="hero-actions">
-          <a class="btn" href="#contact">Plan Your Journey</a>
-          <a class="btn btn-light" href="#packages">View Packages</a>
+  <!-- ─── NAV ─── -->
+  <nav class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="#" class="nav__brand">
+        <svg class="nav__logo" viewBox="0 0 48 48" width="40" height="40">
+          <rect width="48" height="48" rx="12" fill="#00b4d8"/>
+          <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle"
+                fill="#fff" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="26">A</text>
+        </svg>
+        <div>
+          <span class="nav__name">HAC<span class="accent">s</span></span>
+          <span class="nav__tagline">Handling Aviation &amp; Cargo Services</span>
+        </div>
+      </a>
+      <div class="nav__links" id="navLinks">
+        <a href="#flights">Flights</a>
+        <a href="#destinations">Destinations</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <a href="#contact" class="btn btn--primary nav__cta">Book Now</a>
+      <button class="nav__toggle" id="navToggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <header class="hero" id="hero">
+    <div class="hero__bg"></div>
+    <div class="container hero__content">
+      <div class="hero__badge">✈ Lubumbashi International Airport (FBM)</div>
+      <h1 class="hero__title">All Flights from<br><span class="gradient-text">Lubumbashi</span></h1>
+      <p class="hero__subtitle">Cheapest fares available now — Dubai, Mumbai, Karachi, Cape Town &amp; more. Updated every refresh.</p>
+      <div class="hero__actions">
+        <a href="#flights" class="btn btn--primary btn--lg">View Live Flights</a>
+        <a href="#destinations" class="btn btn--outline btn--lg">Best Fares</a>
+      </div>
+      <div class="hero__stats">
+        <div class="hero__stat">
+          <span class="hero__stat-num" data-count="8">8+</span>
+          <span class="hero__stat-label">Destinations</span>
+        </div>
+        <div class="hero__stat">
+          <span class="hero__stat-num">5+</span>
+          <span class="hero__stat-label">Airlines</span>
+        </div>
+        <div class="hero__stat">
+          <span class="hero__stat-num">24/7</span>
+          <span class="hero__stat-label">Support</span>
         </div>
       </div>
-      <aside class="hero-panel" aria-label="Agency Highlights">
-        <p class="panel-title">Trusted by travelers across the region</p>
-        <ul>
-          <li><strong>24/7</strong> trip support</li>
-          <li><strong>500+</strong> successful bookings</li>
-          <li><strong>12+</strong> partner destinations</li>
-        </ul>
-      </aside>
     </div>
+    <div class="hero__plane">✈</div>
   </header>
 
-  <main>
-    <section id="services" class="section container reveal">
-      <h2>Our Services</h2>
-      <div class="grid cards">
-        <article class="card">
-          <h3>Flight Booking</h3>
-          <p>Best-route flight options for regional and international travel with fare guidance.</p>
-        </article>
-        <article class="card">
-          <h3>Hotel & Stay</h3>
-          <p>Comfortable, secure accommodation choices selected to match your schedule and budget.</p>
-        </article>
-        <article class="card">
-          <h3>Custom Tours</h3>
-          <p>Curated experiences in DRC, Southern Africa, and international destinations.</p>
-        </article>
-        <article class="card">
-          <h3>Business Travel</h3>
-          <p>Efficient itineraries for conferences, site visits, and executive travel needs.</p>
-        </article>
+  <!-- ─── LIVE FLIGHTS ─── -->
+  <section class="section flights" id="flights">
+    <div class="container">
+      <div class="section__header">
+        <div>
+          <h2 class="section__title">Next Departures from <span class="gradient-text">FBM</span></h2>
+          <p class="section__sub">Live flight schedule — refreshes every page load</p>
+        </div>
+        <button class="btn btn--outline btn--sm refresh-btn" id="refreshFlights">
+          <svg class="icon-refresh" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+          </svg>
+          Refresh
+        </button>
       </div>
-    </section>
 
-    <section id="packages" class="section alt reveal">
+      <div class="flights__status">
+        <span class="pulse-dot"></span>
+        <span id="flightStatus">Loading flights…</span>
+        <span class="flights__time" id="lastUpdated"></span>
+      </div>
+
+      <div class="flights__board" id="flightBoard">
+        <!-- Skeleton placeholders injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DESTINATIONS / BEST FARES ─── -->
+  <section class="section destinations" id="destinations">
+    <div class="container">
+      <div class="section__header">
+        <div>
+          <h2 class="section__title">Best Fares to Top <span class="gradient-text">Destinations</span></h2>
+          <p class="section__sub">Starting prices in USD — contact us for exact quotes &amp; booking</p>
+        </div>
+      </div>
+
+      <div class="dest__grid" id="destGrid">
+        <!-- Skeleton placeholders injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SERVICES ─── -->
+  <section class="section services" id="services">
+    <div class="container">
+      <h2 class="section__title center">Why Choose <span class="gradient-text">HACs</span>?</h2>
+      <p class="section__sub center">Your trusted partner for aviation and cargo services in Lubumbashi</p>
+      <div class="services__grid">
+        <div class="service-card reveal">
+          <div class="service-card__icon">💰</div>
+          <h3>Best Price Guarantee</h3>
+          <p>We compare fares across all airlines to get you the cheapest possible price for every route.</p>
+        </div>
+        <div class="service-card reveal">
+          <div class="service-card__icon">🌍</div>
+          <h3>Global Connections</h3>
+          <p>Flights to Dubai, Mumbai, Karachi, Cape Town, Johannesburg, Nairobi, Addis Ababa &amp; more.</p>
+        </div>
+        <div class="service-card reveal">
+          <div class="service-card__icon">📦</div>
+          <h3>Cargo Services</h3>
+          <p>Professional handling of aviation cargo with tracking and secure delivery worldwide.</p>
+        </div>
+        <div class="service-card reveal">
+          <div class="service-card__icon">🕐</div>
+          <h3>24/7 Support</h3>
+          <p>Round-the-clock assistance for bookings, changes, and travel queries. Always here for you.</p>
+        </div>
+        <div class="service-card reveal">
+          <div class="service-card__icon">🛫</div>
+          <h3>Multi-Airline Booking</h3>
+          <p>Ethiopian Airlines, Kenya Airways, South African Airways, RwandAir &amp; more — all in one place.</p>
+        </div>
+        <div class="service-card reveal">
+          <div class="service-card__icon">🤝</div>
+          <h3>Trusted Since Day One</h3>
+          <p>Hundreds of satisfied travelers from Lubumbashi trust HACs for their journeys every month.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA STRIP ─── -->
+  <section class="cta-strip">
+    <div class="container cta-strip__inner">
+      <div>
+        <h2>Ready to fly?</h2>
+        <p>Contact us now for the best possible fares from Lubumbashi</p>
+      </div>
+      <a href="#contact" class="btn btn--gold btn--lg">Get a Quote</a>
+    </div>
+  </section>
+
+  <!-- ─── CONTACT ─── -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <h2 class="section__title center">Book Your <span class="gradient-text">Flight</span></h2>
+      <p class="section__sub center">Reach us anytime — we're always happy to help</p>
+      <div class="contact__grid">
+        <div class="contact__cards">
+          <div class="contact-card reveal">
+            <div class="contact-card__icon">📞</div>
+            <h3>Call or WhatsApp</h3>
+            <a href="tel:+243854833307">+243 854 833 307</a>
+            <a href="tel:+243906013328">+243 906 013 328</a>
+          </div>
+          <div class="contact-card reveal">
+            <div class="contact-card__icon">✉️</div>
+            <h3>Email Us</h3>
+            <a href="mailto:agencyhacs@gmail.com">agencyhacs@gmail.com</a>
+          </div>
+          <div class="contact-card reveal">
+            <div class="contact-card__icon">📍</div>
+            <h3>Visit Our Office</h3>
+            <p>12992, Av. Sandoa<br>Coin Kabalo<br>Lubumbashi, DRC</p>
+          </div>
+        </div>
+        <form class="contact__form reveal" id="contactForm" onsubmit="return false;">
+          <h3>Quick Inquiry</h3>
+          <div class="form-row">
+            <input type="text" placeholder="Your Name" required>
+            <input type="tel" placeholder="Phone / WhatsApp" required>
+          </div>
+          <div class="form-row">
+            <select required>
+              <option value="" disabled selected>Where do you want to go?</option>
+              <option>Dubai (DXB)</option>
+              <option>Mumbai (BOM)</option>
+              <option>Karachi (KHI)</option>
+              <option>Cape Town (CPT)</option>
+              <option>Johannesburg (JNB)</option>
+              <option>Nairobi (NBO)</option>
+              <option>Addis Ababa (ADD)</option>
+              <option>Kigali (KGL)</option>
+              <option>Dar es Salaam (DAR)</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <input type="date" placeholder="Preferred Date" required>
+            <input type="number" placeholder="Passengers" min="1" max="20" value="1">
+          </div>
+          <textarea placeholder="Any special requests..." rows="3"></textarea>
+          <button type="submit" class="btn btn--primary btn--lg btn--full" id="submitInquiry">Send Inquiry</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <span class="nav__name">HAC<span class="accent">s</span></span>
+        <p>Handling Aviation &amp; Cargo Services<br>Your gateway from Lubumbashi to the world.</p>
+      </div>
+      <div class="footer__links">
+        <h4>Quick Links</h4>
+        <a href="#flights">Live Flights</a>
+        <a href="#destinations">Best Fares</a>
+        <a href="#services">Our Services</a>
+        <a href="#contact">Contact Us</a>
+      </div>
+      <div class="footer__links">
+        <h4>Top Destinations</h4>
+        <a href="#destinations">Dubai (DXB)</a>
+        <a href="#destinations">Mumbai (BOM)</a>
+        <a href="#destinations">Karachi (KHI)</a>
+        <a href="#destinations">Cape Town (CPT)</a>
+      </div>
+      <div class="footer__links">
+        <h4>Contact</h4>
+        <a href="tel:+243854833307">+243 854 833 307</a>
+        <a href="tel:+243906013328">+243 906 013 328</a>
+        <a href="mailto:agencyhacs@gmail.com">agencyhacs@gmail.com</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
       <div class="container">
-        <h2>Featured Packages</h2>
-        <div class="grid destinations">
-          <article class="tile">
-            <h3>Lubumbashi Explorer</h3>
-            <p>2 days city discovery, cultural stops, and private transport.</p>
-          </article>
-          <article class="tile">
-            <h3>Zambia Weekend</h3>
-            <p>Cross-border short trip with hotel booking and guided activities.</p>
-          </article>
-          <article class="tile">
-            <h3>Tanzania Safari</h3>
-            <p>Wildlife circuit with accommodation, flights, and transfers included.</p>
-          </article>
-          <article class="tile">
-            <h3>Dubai Escape</h3>
-            <p>Visa support, premium stay options, and curated city experiences.</p>
-          </article>
-        </div>
+        <p>&copy; 2026 HACs — Handling Aviation &amp; Cargo Services. All rights reserved.</p>
       </div>
-    </section>
-
-    <section class="section container stats reveal">
-      <article>
-        <h3>98%</h3>
-        <p>Client satisfaction rate on recent bookings.</p>
-      </article>
-      <article>
-        <h3>40+</h3>
-        <p>Corporate trips coordinated in the past year.</p>
-      </article>
-      <article>
-        <h3>15 min</h3>
-        <p>Average first response time for new inquiries.</p>
-      </article>
-    </section>
-
-    <section class="section alt reveal">
-      <div class="container timeline">
-        <h2>How Booking Works</h2>
-        <div class="grid timeline-grid">
-          <article>
-            <h3>1. Tell Us Your Plan</h3>
-            <p>Share destination, dates, and travel goals by form or WhatsApp.</p>
-          </article>
-          <article>
-            <h3>2. Get Your Itinerary</h3>
-            <p>Receive a custom package with flights, hotel options, and pricing.</p>
-          </article>
-          <article>
-            <h3>3. Confirm & Travel</h3>
-            <p>We handle confirmations and support you from departure to return.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section container reveal">
-      <h2>Traveler Reviews</h2>
-      <div class="grid testimonials">
-        <blockquote>
-          "The visa and hotel process was seamless. HACS handled every detail."
-          <cite> - Nadine M., Lubumbashi</cite>
-        </blockquote>
-        <blockquote>
-          "Our team trip to Tanzania was perfectly coordinated and on budget."
-          <cite> - K. Ilunga, Operations Manager</cite>
-        </blockquote>
-      </div>
-    </section>
-
-    <section id="contact" class="section container reveal">
-      <h2>Start Your Trip</h2>
-      <p>Tell us where you want to go, and we will build your ideal itinerary.</p>
-      <form class="contact-form" action="#" method="post">
-        <label for="name">Name</label>
-        <input id="name" name="name" type="text" placeholder="Your name" required />
-
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" placeholder="you@example.com" required />
-
-        <label for="message">Travel Plan</label>
-        <textarea id="message" name="message" rows="4" placeholder="Destination, dates, group size..."></textarea>
-
-        <button type="submit">Send Request</button>
-      </form>
-    </section>
-
-    <section class="section cta-strip reveal">
-      <div class="container cta-content">
-        <h2>Ready for Your Next Journey?</h2>
-        <a class="btn" href="#contact">Get a Free Quote</a>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container footer-content">
-      <strong>HACS Agency</strong>
-      <span>Travel Agency | Lubumbashi, DRC | hacs-agency.com</span>
     </div>
   </footer>
-  
+
+  <script src="app.js"></script>
 </body>
 </html>
