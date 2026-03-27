@@ -1,6 +1,10 @@
 /* ═══════════════════════════════════════════
    HACs — Flight Data Engine
+   Auto-refresh • Particles • Animations
    ═══════════════════════════════════════════ */
+
+// ── Config ──
+const AUTO_REFRESH_INTERVAL = 45; // seconds
 
 // ── Airlines that operate from FBM ──
 const AIRLINES = [
@@ -14,15 +18,15 @@ const AIRLINES = [
 
 // ── Route data with realistic durations and base fares ──
 const ROUTES = [
-  { code: 'DXB', city: 'Dubai',          country: 'UAE',          flag: '🇦🇪', airlines: ['ET','KQ'],    durationMin: 480, baseFare: 520,  gradient: 'linear-gradient(135deg,#f5af19,#f12711)' },
-  { code: 'BOM', city: 'Mumbai',         country: 'India',        flag: '🇮🇳', airlines: ['ET'],         durationMin: 620, baseFare: 580,  gradient: 'linear-gradient(135deg,#11998e,#38ef7d)' },
-  { code: 'KHI', city: 'Karachi',        country: 'Pakistan',     flag: '🇵🇰', airlines: ['ET','KQ'],    durationMin: 660, baseFare: 610,  gradient: 'linear-gradient(135deg,#0f2027,#2c5364)' },
-  { code: 'CPT', city: 'Cape Town',      country: 'South Africa', flag: '🇿🇦', airlines: ['SA'],         durationMin: 340, baseFare: 380,  gradient: 'linear-gradient(135deg,#667eea,#764ba2)' },
-  { code: 'JNB', city: 'Johannesburg',   country: 'South Africa', flag: '🇿🇦', airlines: ['SA'],         durationMin: 250, baseFare: 310,  gradient: 'linear-gradient(135deg,#fc5c7d,#6a82fb)' },
-  { code: 'NBO', city: 'Nairobi',        country: 'Kenya',        flag: '🇰🇪', airlines: ['KQ'],         durationMin: 220, baseFare: 270,  gradient: 'linear-gradient(135deg,#f093fb,#f5576c)' },
-  { code: 'ADD', city: 'Addis Ababa',    country: 'Ethiopia',     flag: '🇪🇹', airlines: ['ET'],         durationMin: 260, baseFare: 290,  gradient: 'linear-gradient(135deg,#4facfe,#00f2fe)' },
-  { code: 'KGL', city: 'Kigali',         country: 'Rwanda',       flag: '🇷🇼', airlines: ['WB'],         durationMin: 130, baseFare: 210,  gradient: 'linear-gradient(135deg,#43e97b,#38f9d7)' },
-  { code: 'DAR', city: 'Dar es Salaam',  country: 'Tanzania',     flag: '🇹🇿', airlines: ['TC','KQ'],    durationMin: 200, baseFare: 250,  gradient: 'linear-gradient(135deg,#fa709a,#fee140)' },
+  { code: 'DXB', city: 'Dubai',          country: 'UAE',          flag: '🇦🇪', airlines: ['ET','KQ'],    durationMin: 480, baseFare: 520 },
+  { code: 'BOM', city: 'Mumbai',         country: 'India',        flag: '🇮🇳', airlines: ['ET'],         durationMin: 620, baseFare: 580 },
+  { code: 'KHI', city: 'Karachi',        country: 'Pakistan',     flag: '🇵🇰', airlines: ['ET','KQ'],    durationMin: 660, baseFare: 610 },
+  { code: 'CPT', city: 'Cape Town',      country: 'South Africa', flag: '🇿🇦', airlines: ['SA'],         durationMin: 340, baseFare: 380 },
+  { code: 'JNB', city: 'Johannesburg',   country: 'South Africa', flag: '🇿🇦', airlines: ['SA'],         durationMin: 250, baseFare: 310 },
+  { code: 'NBO', city: 'Nairobi',        country: 'Kenya',        flag: '🇰🇪', airlines: ['KQ'],         durationMin: 220, baseFare: 270 },
+  { code: 'ADD', city: 'Addis Ababa',    country: 'Ethiopia',     flag: '🇪🇹', airlines: ['ET'],         durationMin: 260, baseFare: 290 },
+  { code: 'KGL', city: 'Kigali',         country: 'Rwanda',       flag: '🇷🇼', airlines: ['WB'],         durationMin: 130, baseFare: 210 },
+  { code: 'DAR', city: 'Dar es Salaam',  country: 'Tanzania',     flag: '🇹🇿', airlines: ['TC','KQ'],    durationMin: 200, baseFare: 250 },
 ];
 
 const STATUSES = [
@@ -67,22 +71,21 @@ function generateFlights() {
     const airlineCode = pick(route.airlines);
     const airline = AIRLINES.find(a => a.code === airlineCode) || pick(AIRLINES);
 
-    const depOffset = rand(15 + i * 50, 60 + i * 90); // minutes from now, spread out
+    const depOffset = rand(15 + i * 50, 60 + i * 90);
     const dep = new Date(now.getTime() + depOffset * 60000);
     const arr = new Date(dep.getTime() + (route.durationMin + rand(-15, 15)) * 60000);
 
-    const status = i === 0 ? STATUSES[2] : pickWeighted(STATUSES); // first flight is "Boarding"
+    const status = i === 0 ? STATUSES[2] : pickWeighted(STATUSES);
     const flightNum = airline.code + rand(100, 999);
-    const gate = String.fromCharCode(65 + rand(0, 3)) + rand(1, 18);
 
-    flights.push({ airline, flightNum, route, dep, arr, status, gate });
+    flights.push({ airline, flightNum, route, dep, arr, status });
   }
 
   flights.sort((a, b) => a.dep - b.dep);
   return flights;
 }
 
-// ── Generate fare data for destinations ──
+// ── Generate fare data ──
 function generateFares() {
   return ROUTES.map(route => {
     const airlineCode = pick(route.airlines);
@@ -91,7 +94,6 @@ function generateFares() {
     const price = route.baseFare + variation;
     const depDate = new Date();
     depDate.setDate(depDate.getDate() + rand(2, 21));
-
     return { ...route, airline, price, depDate };
   }).sort((a, b) => a.price - b.price);
 }
@@ -120,20 +122,16 @@ function renderDestSkeletons() {
     const el = document.createElement('div');
     el.className = 'skeleton-dest';
     el.innerHTML = `
-      <div style="display:flex;justify-content:space-between;margin-bottom:20px">
-        <div class="skeleton" style="width:48px;height:48px;border-radius:12px"></div>
-        <div class="skeleton" style="width:80px;height:28px;border-radius:6px"></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+        <div class="skeleton" style="width:40px;height:40px;border-radius:10px"></div>
+        <div class="skeleton" style="width:72px;height:24px;border-radius:6px"></div>
       </div>
-      <div class="skeleton skeleton--text" style="width:60%;height:22px;margin-bottom:8px"></div>
+      <div class="skeleton skeleton--text" style="width:60%;height:18px;margin-bottom:6px"></div>
       <div class="skeleton skeleton--text-sm" style="width:40%"></div>
-      <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div><div class="skeleton skeleton--text-sm" style="width:50%"></div><div class="skeleton skeleton--text" style="margin-top:6px"></div></div>
-          <div><div class="skeleton skeleton--text-sm" style="width:50%"></div><div class="skeleton skeleton--text" style="margin-top:6px"></div></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05)">
-          <div class="skeleton" style="width:100px;height:32px;border-radius:6px"></div>
-          <div class="skeleton" style="width:90px;height:36px;border-radius:50px"></div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div><div class="skeleton skeleton--text-sm" style="width:50%"></div><div class="skeleton skeleton--text" style="margin-top:4px"></div></div>
+          <div><div class="skeleton skeleton--text-sm" style="width:50%"></div><div class="skeleton skeleton--text" style="margin-top:4px"></div></div>
         </div>
       </div>`;
     grid.appendChild(el);
@@ -152,9 +150,10 @@ function renderFlights(flights) {
       <span>Status</span>
     </div>`;
 
-  flights.forEach(f => {
+  flights.forEach((f, i) => {
     const row = document.createElement('div');
     row.className = 'flight-row';
+    row.style.animationDelay = (i * 0.06) + 's';
     row.innerHTML = `
       <div class="flight-row__airline">
         <span class="flight-row__airline-flag">${f.airline.flag}</span>
@@ -179,7 +178,7 @@ function renderFlights(flights) {
     board.appendChild(row);
   });
 
-  document.getElementById('flightStatus').textContent = `Showing ${flights.length} upcoming departures`;
+  document.getElementById('flightStatus').textContent = `${flights.length} upcoming departures`;
   document.getElementById('lastUpdated').textContent = 'Updated ' + formatTime(new Date());
 }
 
@@ -191,7 +190,7 @@ function renderFares(fares) {
   fares.forEach((f, i) => {
     const card = document.createElement('div');
     card.className = 'dest-card';
-    card.style.animationDelay = (i * 0.08) + 's';
+    card.style.animationDelay = (i * 0.07) + 's';
     card.innerHTML = `
       <div class="dest-card__header">
         <span class="dest-card__flag">${f.flag}</span>
@@ -228,22 +227,68 @@ function renderFares(fares) {
   });
 }
 
-// ── Load Data with loading state ──
+// ── Load Data ──
 async function loadFlights() {
   renderFlightSkeletons();
   document.getElementById('flightStatus').textContent = 'Fetching flight data…';
-
-  await new Promise(r => setTimeout(r, rand(800, 1800)));
-
-  const flights = generateFlights();
-  renderFlights(flights);
+  await new Promise(r => setTimeout(r, rand(600, 1200)));
+  renderFlights(generateFlights());
 }
 
 async function loadFares() {
   renderDestSkeletons();
-  await new Promise(r => setTimeout(r, rand(1000, 2200)));
-  const fares = generateFares();
-  renderFares(fares);
+  await new Promise(r => setTimeout(r, rand(800, 1400)));
+  renderFares(generateFares());
+}
+
+async function refreshAll() {
+  await Promise.all([loadFlights(), loadFares()]);
+}
+
+// ── Auto-Refresh System ──
+let refreshTimer = null;
+let countdownTimer = null;
+
+function startAutoRefresh() {
+  clearInterval(refreshTimer);
+  clearInterval(countdownTimer);
+
+  let remaining = AUTO_REFRESH_INTERVAL;
+  const bar = document.getElementById('autoRefreshBar');
+  const countdown = document.getElementById('refreshCountdown');
+
+  // Reset bar
+  if (bar) {
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    // Force reflow
+    bar.offsetHeight;
+    bar.style.transition = 'width 1s linear';
+  }
+
+  function updateCountdown() {
+    if (countdown) {
+      countdown.textContent = `Auto-refresh in ${remaining}s`;
+    }
+    if (bar) {
+      const pct = ((AUTO_REFRESH_INTERVAL - remaining) / AUTO_REFRESH_INTERVAL) * 100;
+      bar.style.width = pct + '%';
+    }
+    remaining--;
+
+    if (remaining < 0) {
+      clearInterval(countdownTimer);
+      doAutoRefresh();
+    }
+  }
+
+  updateCountdown();
+  countdownTimer = setInterval(updateCountdown, 1000);
+}
+
+async function doAutoRefresh() {
+  await refreshAll();
+  startAutoRefresh();
 }
 
 // ── Navigation ──
@@ -252,9 +297,16 @@ function initNav() {
   const toggle = document.getElementById('navToggle');
   const links = document.getElementById('navLinks');
 
+  let ticking = false;
   window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 50);
-  });
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
 
   toggle.addEventListener('click', () => {
     links.classList.toggle('open');
@@ -267,9 +319,40 @@ function initNav() {
       toggle.classList.remove('active');
     });
   });
+
+  // Close menu on outside click
+  document.addEventListener('click', (e) => {
+    if (!nav.contains(e.target) && links.classList.contains('open')) {
+      links.classList.remove('open');
+      toggle.classList.remove('active');
+    }
+  });
 }
 
-// ── Scroll Reveal (enhanced for all types) ──
+// ── Hero Particles ──
+function initParticles() {
+  const container = document.getElementById('heroParticles');
+  if (!container) return;
+
+  // Fewer particles on mobile
+  const count = window.innerWidth < 768 ? 6 : 12;
+
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'hero__particle';
+    const size = rand(2, 6);
+    p.style.cssText = `
+      width: ${size}px; height: ${size}px;
+      left: ${rand(5, 95)}%;
+      animation-duration: ${rand(8, 18)}s;
+      animation-delay: ${rand(0, 10)}s;
+      opacity: ${(rand(3, 8) / 10)};
+    `;
+    container.appendChild(p);
+  }
+}
+
+// ── Scroll Reveal ──
 function initReveal() {
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(e => {
@@ -278,11 +361,12 @@ function initReveal() {
         obs.unobserve(e.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-  document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => obs.observe(el));
+  }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 }
 
-// ── Counter animation for hero stats ──
+// ── Counter Animation ──
 function initCounters() {
   const counters = document.querySelectorAll('.hero__stat-num[data-count]');
   const obs = new IntersectionObserver((entries) => {
@@ -292,12 +376,12 @@ function initCounters() {
         const target = parseInt(el.dataset.count, 10);
         const suffix = el.textContent.replace(/[0-9]/g, '');
         let current = 0;
-        const step = Math.ceil(target / 30);
+        const step = Math.ceil(target / 25);
         const timer = setInterval(() => {
           current += step;
           if (current >= target) { current = target; clearInterval(timer); }
           el.textContent = current + suffix;
-        }, 40);
+        }, 50);
         obs.unobserve(el);
       }
     });
@@ -310,9 +394,9 @@ function initRefresh() {
   const btn = document.getElementById('refreshFlights');
   btn.addEventListener('click', async () => {
     btn.classList.add('spinning');
-    await loadFlights();
-    await loadFares();
-    setTimeout(() => btn.classList.remove('spinning'), 500);
+    await refreshAll();
+    startAutoRefresh(); // Reset timer on manual refresh
+    setTimeout(() => btn.classList.remove('spinning'), 600);
   });
 }
 
@@ -320,8 +404,10 @@ function initRefresh() {
 function initForm() {
   const form = document.getElementById('contactForm');
   const btn = document.getElementById('submitInquiry');
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+
     const name = form.querySelector('input[type="text"]').value.trim();
     const phone = form.querySelector('input[type="tel"]').value.trim();
     const dest = form.querySelector('select').value;
@@ -348,11 +434,13 @@ function initForm() {
   });
 }
 
-// ── Smooth scroll for nav links (better mobile) ──
+// ── Smooth Scroll ──
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', (e) => {
-      const target = document.querySelector(a.getAttribute('href'));
+      const href = a.getAttribute('href');
+      if (href === '#') return;
+      const target = document.querySelector(href);
       if (target) {
         e.preventDefault();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -361,14 +449,18 @@ function initSmoothScroll() {
   });
 }
 
-// ── Init ──
+// ── Init Everything ──
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
+  initParticles();
   initReveal();
   initCounters();
   initRefresh();
   initForm();
   initSmoothScroll();
-  loadFlights();
-  loadFares();
+
+  // Initial load
+  refreshAll().then(() => {
+    startAutoRefresh();
+  });
 });
