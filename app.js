@@ -269,12 +269,40 @@ function initNav() {
   });
 }
 
-// ── Scroll Reveal ──
+// ── Scroll Reveal (enhanced for all types) ──
 function initReveal() {
   const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => obs.observe(el));
+}
+
+// ── Counter animation for hero stats ──
+function initCounters() {
+  const counters = document.querySelectorAll('.hero__stat-num[data-count]');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        const target = parseInt(el.dataset.count, 10);
+        const suffix = el.textContent.replace(/[0-9]/g, '');
+        let current = 0;
+        const step = Math.ceil(target / 30);
+        const timer = setInterval(() => {
+          current += step;
+          if (current >= target) { current = target; clearInterval(timer); }
+          el.textContent = current + suffix;
+        }, 40);
+        obs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => obs.observe(c));
 }
 
 // ── Refresh Button ──
@@ -288,15 +316,29 @@ function initRefresh() {
   });
 }
 
-// ── Contact Form ──
+// ── Contact Form → WhatsApp ──
 function initForm() {
   const form = document.getElementById('contactForm');
   const btn = document.getElementById('submitInquiry');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    btn.textContent = '✓ Inquiry Sent!';
-    btn.style.background = '#06d6a0';
-    btn.style.borderColor = '#06d6a0';
+    const name = form.querySelector('input[type="text"]').value.trim();
+    const phone = form.querySelector('input[type="tel"]').value.trim();
+    const dest = form.querySelector('select').value;
+    const date = form.querySelector('input[type="date"]').value;
+    const pax = form.querySelector('input[type="number"]').value;
+    const notes = form.querySelector('textarea').value.trim();
+
+    const msg = `Hi HACs! I'd like to book a flight.\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Destination:* ${dest}\n*Date:* ${date}\n*Passengers:* ${pax}${notes ? '\n*Notes:* ' + notes : ''}`;
+
+    const waURL = 'https://wa.me/243854833307?text=' + encodeURIComponent(msg);
+
+    btn.textContent = '✓ Opening WhatsApp…';
+    btn.style.background = '#25d366';
+    btn.style.borderColor = '#25d366';
+
+    window.open(waURL, '_blank', 'noopener');
+
     setTimeout(() => {
       btn.textContent = 'Send Inquiry';
       btn.style.background = '';
@@ -306,12 +348,27 @@ function initForm() {
   });
 }
 
+// ── Smooth scroll for nav links (better mobile) ──
+function initSmoothScroll() {
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+}
+
 // ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
   initReveal();
+  initCounters();
   initRefresh();
   initForm();
+  initSmoothScroll();
   loadFlights();
   loadFares();
 });

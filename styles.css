@@ -392,14 +392,123 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 .footer__bottom { padding: 24px 0; }
 .footer__bottom p { text-align: center; color: var(--text-dim); font-size: 0.8rem; }
 
-/* ── REVEAL ANIMATIONS ── */
-.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+/* ── WHATSAPP BUTTONS ── */
+.btn--whatsapp {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 50px; font-size: 0.78rem; font-weight: 600;
+  background: #25d366; color: #fff; border: 2px solid #25d366;
+  text-decoration: none; transition: var(--transition); white-space: nowrap;
+  font-family: var(--font-display);
+}
+.btn--whatsapp:hover {
+  background: #128c7e; border-color: #128c7e;
+  transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+}
+.btn--whatsapp svg { flex-shrink: 0; }
 
+.contact-phone-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;
+}
+.contact-phone-row a:first-child {
+  color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: var(--transition);
+}
+.contact-phone-row a:first-child:hover { color: var(--blue); }
+
+/* ── FLOATING WHATSAPP BUTTON ── */
+.whatsapp-float {
+  position: fixed; bottom: 28px; right: 28px; z-index: 999;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: #25d366; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 24px rgba(37,211,102,0.45);
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  text-decoration: none;
+  animation: whatsappBounce 2s ease infinite 3s;
+}
+.whatsapp-float:hover {
+  transform: scale(1.12);
+  box-shadow: 0 8px 32px rgba(37,211,102,0.55);
+}
+.whatsapp-float__tooltip {
+  position: absolute; right: 72px; top: 50%; transform: translateY(-50%);
+  background: #fff; color: #333; padding: 8px 14px; border-radius: 8px;
+  font-size: 0.8rem; font-weight: 600; white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(-50%) translateX(8px);
+}
+.whatsapp-float__tooltip::after {
+  content: ''; position: absolute; top: 50%; right: -6px;
+  transform: translateY(-50%);
+  border: 6px solid transparent; border-left-color: #fff;
+}
+.whatsapp-float:hover .whatsapp-float__tooltip {
+  opacity: 1; transform: translateY(-50%) translateX(0);
+}
+@keyframes whatsappBounce {
+  0%, 100% { transform: translateY(0); }
+  15% { transform: translateY(-8px); }
+  30% { transform: translateY(0); }
+  45% { transform: translateY(-4px); }
+  60% { transform: translateY(0); }
+}
+
+/* ── FOOTER WHATSAPP ICONS ── */
+.footer-phone-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.footer-phone-row a:first-child { flex: 1; }
+.footer-wa {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(37,211,102,0.15); color: #25d366;
+  transition: var(--transition); flex-shrink: 0;
+}
+.footer-wa:hover {
+  background: #25d366; color: #fff; transform: scale(1.15);
+}
+
+/* ── ENHANCED ANIMATIONS ── */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0,180,216,0.15); }
+  50% { box-shadow: 0 0 40px rgba(0,180,216,0.3); }
+}
+
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+.reveal-right { opacity: 0; transform: translateX(30px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+.reveal-scale { opacity: 0; transform: scale(0.9); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+.reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+/* Stagger children animations */
+.stagger-children .reveal:nth-child(1) { transition-delay: 0.05s; }
+.stagger-children .reveal:nth-child(2) { transition-delay: 0.1s; }
+.stagger-children .reveal:nth-child(3) { transition-delay: 0.15s; }
+.stagger-children .reveal:nth-child(4) { transition-delay: 0.2s; }
+.stagger-children .reveal:nth-child(5) { transition-delay: 0.25s; }
+.stagger-children .reveal:nth-child(6) { transition-delay: 0.3s; }
 
 /* ── REFRESH BUTTON ── */
 .refresh-btn .icon-refresh { transition: transform 0.5s ease; }
@@ -422,8 +531,15 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
     display: flex; flex-direction: column;
     position: absolute; top: 100%; left: 0; right: 0;
     background: var(--glass); backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     padding: 20px 24px; gap: 16px;
     border-bottom: 1px solid var(--glass-border);
+    animation: slideDown 0.3s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .hero { min-height: auto; padding: 120px 0 64px; }
@@ -434,7 +550,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
   .flight-header { display: none; }
   .flight-row {
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 12px; padding: 16px;
   }
   .flight-row__status { grid-column: 1 / -1; }
   .skeleton-row { grid-template-columns: 1fr 1fr; }
@@ -447,6 +563,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 
   .footer__inner { grid-template-columns: 1fr; gap: 32px; }
   .form-row { flex-direction: column; }
+
+  .whatsapp-float { width: 54px; height: 54px; bottom: 20px; right: 20px; }
+  .whatsapp-float svg { width: 24px; height: 24px; }
+  .whatsapp-float__tooltip { display: none; }
+
+  .contact-phone-row { gap: 8px; }
 }
 
 @media (max-width: 480px) {
@@ -456,6 +578,28 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
   .hero__actions { flex-direction: column; }
   .hero__actions .btn { width: 100%; justify-content: center; }
   .hero__stats { flex-direction: column; gap: 16px; }
+
+  .btn--whatsapp { padding: 5px 10px; font-size: 0.72rem; }
+
+  .flight-row { grid-template-columns: 1fr; gap: 10px; padding: 14px; }
+  .flight-row__status { text-align: center; }
+
+  .dest-card { padding: 20px; }
+  .dest-card__price { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .dest-card__book { width: 100%; justify-content: center; }
+
+  .service-card { padding: 24px; }
+  .contact-card { padding: 20px; }
+  .contact__form { padding: 24px; }
+
+  .cta-strip { padding: 40px 0; }
+  .cta-strip h2 { font-size: 1.4rem; }
+}
+
+@media (max-width: 360px) {
+  .nav__logo-img { width: min(160px, 55vw); }
+  .hero__title { font-size: 1.7rem; }
+  .hero__badge { font-size: 0.75rem; padding: 6px 14px; }
 }
 
 /* ── SCROLLBAR ── */
