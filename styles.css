@@ -101,6 +101,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 }
 .nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
 .nav__brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+.nav__logo-img {
+  width: min(300px, 34vw);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 4px 14px rgba(0,0,0,0.25));
+}
 .nav__name { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: #fff; }
 .nav__tagline { display: block; font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; }
 .nav__links { display: flex; gap: 32px; }
@@ -372,7 +378,13 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 /* ── FOOTER ── */
 .footer { background: var(--bg-secondary); padding-top: 64px; }
 .footer__inner { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 40px; border-bottom: 1px solid var(--glass-border); }
-.footer__brand .nav__name { font-size: 1.8rem; display: block; margin-bottom: 12px; }
+.footer__logo-img {
+  width: min(320px, 100%);
+  height: auto;
+  display: block;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 5px 18px rgba(0,0,0,0.2));
+}
 .footer__brand p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
 .footer__links h4 { font-size: 0.9rem; margin-bottom: 16px; color: #fff; }
 .footer__links a { display: block; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; padding: 4px 0; transition: var(--transition); }
@@ -401,6 +413,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 
 @media (max-width: 768px) {
   .section { padding: 64px 0; }
+
+  .nav__logo-img { width: min(220px, 58vw); }
 
   .nav__links, .nav__cta { display: none; }
   .nav__toggle { display: flex; }
@@ -437,6 +451,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 
 @media (max-width: 480px) {
   .container { padding: 0 16px; }
+  .nav__logo-img { width: min(190px, 62vw); }
   .hero__title { font-size: 2rem; }
   .hero__actions { flex-direction: column; }
   .hero__actions .btn { width: 100%; justify-content: center; }
