@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 160" width="380" height="160">
+  <defs>
+    <style>
+      .hacs-text { font-family: 'Georgia', 'Times New Roman', serif; font-weight: bold; }
+      .la-text { font-family: 'Georgia', 'Times New Roman', serif; font-weight: normal; }
+      .tagline { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; }
+    </style>
+  </defs>
+  <!-- Gray arc/swoosh above -->
+  <path d="M160 12 Q220 -8 260 18 Q280 30 270 50" fill="none" stroke="#9aabb8" stroke-width="8" stroke-linecap="round"/>
+  <!-- HACs text in blue -->
+  <text x="62" y="90" class="hacs-text" fill="#2856a3" font-size="72">HACs</text>
+  <!-- L.A text in gray -->
+  <text x="260" y="72" class="la-text" fill="#7a8a9a" font-size="30">L.A</text>
+  <!-- Blue swoosh below -->
+  <path d="M40 108 Q80 135 140 118" fill="none" stroke="#2856a3" stroke-width="7" stroke-linecap="round"/>
+  <!-- Airplane silhouette -->
+  <g transform="translate(128, 98) rotate(-25) scale(0.55)">
+    <path d="M0 0 L-18 -8 L-45 -5 L-18 0 L-45 12 L-18 6 L5 14 L8 6 L30 4 L8 0 L30 -6 L5 -8 Z" fill="#7a8a9a"/>
+  </g>
+  <!-- Voyagez Autrement tagline -->
+  <text x="168" y="138" class="tagline" fill="#2856a3" font-size="24">Voyagez Autrement</text>
+</svg>
