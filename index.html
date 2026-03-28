@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HACs L.A — Voyagez Autrement | Travel Agency Lubumbashi</title>
   <meta name="description" content="HACs L.A — Your trusted travel agency in Lubumbashi, DRC. Book flights, cargo services, and travel consulting. Best fares to Dubai, Mumbai, Nairobi & more.">
-  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <link rel="icon" href="Assets/Hacs%20logo%20new.pdf%20(1).png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
   <nav class="nav" id="nav">
     <div class="container nav__inner">
       <a href="#" class="nav__brand">
-        <img src="logo.svg" alt="HACs L.A — Voyagez Autrement" class="nav__logo-img">
+        <img src="Assets/Hacs%20logo%20new.pdf%20(1).png" alt="HACs L.A — Voyagez Autrement" class="nav__logo-img">
       </a>
       <div class="nav__links" id="navLinks">
         <a href="#about" data-i18n="nav_about">About Us</a>
@@ -128,18 +128,22 @@
     </div>
   </section>
 
-  <!-- ─── FLIGHT DEPARTURES ─── -->
+  <!-- ─── FLIGHT DEPARTURES & ARRIVALS ─── -->
   <section class="section flights" id="flights">
     <div class="container">
       <div class="section__header">
         <div>
-          <h2 class="section__title" data-i18n-html="flights_title">Flight Departures — <span class="gradient-text">Lubumbashi (FBM)</span></h2>
-          <p class="section__sub" data-i18n="flights_sub">Scheduled departure times from Lubumbashi International Airport</p>
+          <h2 class="section__title" data-i18n-html="flights_title">Live Flights — <span class="gradient-text">Lubumbashi (FBM)</span></h2>
+          <p class="section__sub" data-i18n="flights_sub">Real-time departures &amp; arrivals at Lubumbashi International Airport</p>
         </div>
         <div class="flights__controls">
-          <select class="airport-select" id="airportSelect">
-            <option value="FBM" selected>Lubumbashi (FBM)</option>
-          </select>
+          <button class="btn btn--ghost btn--sm configure-btn" id="openConfigure" title="Configure AeroAPI">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span data-i18n="flights_configure">Configure</span>
+          </button>
           <button class="btn btn--outline btn--sm refresh-btn" id="refreshFlights">
             <svg class="icon-refresh" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M23 4v6h-6M1 20v-6h6"/>
@@ -150,22 +154,85 @@
         </div>
       </div>
 
+      <!-- Tabs -->
+      <div class="flight-tabs">
+        <button class="flight-tab active" data-tab="departures">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2H8"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span data-i18n="flights_tab_dep">Departures</span>
+        </button>
+        <button class="flight-tab" data-tab="arrivals">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span data-i18n="flights_tab_arr">Arrivals</span>
+        </button>
+      </div>
+
       <div class="flights__status">
         <span class="pulse-dot"></span>
         <span id="flightStatus" data-i18n="flights_loading">Loading flights…</span>
+        <span class="data-source-badge" id="dataSourceBadge"></span>
         <span class="flights__countdown" id="refreshCountdown"></span>
         <span class="flights__time" id="lastUpdated"></span>
       </div>
 
       <div class="flights__board" id="flightBoard"></div>
 
-      <p class="flights__note" data-i18n="flights_note">Flight times are based on published airline schedules. Actual times may vary — contact us for confirmation.</p>
+      <p class="flights__note" data-i18n="flights_note">Times shown in CAT (UTC+2). Powered by AeroAPI — actual times may vary.</p>
 
       <div class="auto-refresh-bar">
         <div class="auto-refresh-bar__fill" id="autoRefreshBar"></div>
       </div>
     </div>
   </section>
+
+  <!-- ─── CONFIGURE MODAL ─── -->
+  <div class="cfg-modal" id="configureModal" role="dialog" aria-modal="true" aria-labelledby="cfgModalTitle">
+    <div class="cfg-modal__panel">
+      <button class="cfg-modal__close" id="cfgCloseBtn" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+
+      <div class="cfg-modal__logo">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+        </svg>
+      </div>
+
+      <h2 class="cfg-modal__title" id="cfgModalTitle" data-i18n="cfg_title">Configure AeroAPI</h2>
+      <p class="cfg-modal__subtitle" data-i18n="cfg_subtitle">Enter your FlightAware AeroAPI key to enable live flight data</p>
+
+      <div id="cfgStatusText" class="cfg-status cfg-status--none" data-i18n="cfg_status_none">● No key — showing schedule</div>
+
+      <div class="cfg-modal__field">
+        <label for="aeroApiKeyInput" data-i18n="cfg_key_label">AeroAPI Key</label>
+        <input
+          type="password"
+          id="aeroApiKeyInput"
+          class="cfg-modal__input"
+          autocomplete="off"
+          spellcheck="false"
+          data-i18n-placeholder="cfg_key_placeholder"
+          placeholder="Paste your AeroAPI key here…"
+        >
+      </div>
+
+      <div id="cfgFeedback" class="cfg-feedback" aria-live="polite"></div>
+
+      <div class="cfg-modal__actions">
+        <button class="btn btn--outline" id="cfgCancelBtn" data-i18n="cfg_cancel">Cancel</button>
+        <button class="btn btn--primary" id="cfgSaveBtn" data-i18n="cfg_save">Save &amp; Connect</button>
+      </div>
+
+      <a href="https://www.flightaware.com/commercial/aeroapi/" target="_blank" rel="noopener noreferrer" class="cfg-modal__link" data-i18n="cfg_get_key">Get a free AeroAPI key →</a>
+    </div>
+  </div>
 
   <!-- ─── DESTINATIONS / BEST FARES ─── -->
   <section class="section destinations" id="destinations">
@@ -310,7 +377,7 @@
   <footer class="footer">
     <div class="container footer__inner">
       <div class="footer__brand">
-        <img src="logo.svg" alt="HACs L.A" class="footer__logo-img">
+        <img src="Assets/Hacs%20logo%20new.pdf%20(1).png" alt="HACs L.A" class="footer__logo-img">
         <p data-i18n="footer_desc">Handling Aviation &amp; Cargo Services — Your gateway from Lubumbashi to the world.</p>
       </div>
       <div class="footer__links">

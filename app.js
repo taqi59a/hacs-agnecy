@@ -1,15 +1,18 @@
 /* ═══════════════════════════════════════════
    HACs L.A — Flight Engine + Bilingual i18n
-   Real schedule data • AviationStack API
+   AeroAPI live data via backend • UTC→CAT display
    ═══════════════════════════════════════════ */
 
 // ── Config ──
 const AUTO_REFRESH_INTERVAL = 120; // seconds
-// To enable live API data, set your AviationStack key here (free at aviationstack.com)
-const AVIATIONSTACK_API_KEY = ''; // e.g. 'abc123...'
+const FLIGHTS_API_ENDPOINT = '/api/flights';
+const CONFIGURE_API_ENDPOINT = '/api/configure';
 
 // ── Current language (default: English) ──
 let currentLang = localStorage.getItem('hacsLang') || 'en';
+
+// ── Active flight tab ──
+let activeTab = 'departures'; // 'departures' | 'arrivals'
 
 // ═══════════════════════════════════
 //  TRANSLATIONS
@@ -49,20 +52,37 @@ const TRANSLATIONS = {
     about_card3_title: 'Personal Service',
     about_card3_desc: 'Dedicated travel advisors',
     // Flights
-    flights_title: 'Flight Departures — <span class="gradient-text">Lubumbashi (FBM)</span>',
-    flights_sub: 'Scheduled departure times from Lubumbashi International Airport',
+    flights_title: 'Live Flights — <span class="gradient-text">Lubumbashi (FBM)</span>',
+    flights_sub: 'Real-time departures & arrivals at Lubumbashi International Airport',
     flights_refresh: 'Refresh',
+    flights_configure: 'Configure',
+    flights_tab_dep: 'Departures',
+    flights_tab_arr: 'Arrivals',
     flights_loading: 'Loading flights…',
-    flights_note: 'Flight times are based on published airline schedules. Actual times may vary — contact us for confirmation.',
+    flights_note: 'Times shown in CAT (UTC+2). Powered by AeroAPI — actual times may vary.',
     flights_header_airline: 'Airline / Flight',
-    flights_header_dest: 'Destination',
-    flights_header_dep: 'Departure',
-    flights_header_arr: 'Arrival (est.)',
+    flights_header_airport: 'Airport',
+    flights_header_dep: 'Departure (CAT)',
+    flights_header_arr: 'Arrival (CAT)',
     flights_header_status: 'Status',
     flights_upcoming: 'upcoming departures',
-    flights_fetching: 'Fetching flight data…',
+    flights_upcoming_arr: 'expected arrivals',
+    flights_fetching: 'Fetching live data…',
     flights_autorefresh: 'Auto-refresh in',
     flights_updated: 'Updated',
+    // Configure modal
+    cfg_title: 'Configure AeroAPI',
+    cfg_subtitle: 'Enter your FlightAware AeroAPI key to enable live flight data',
+    cfg_key_label: 'AeroAPI Key',
+    cfg_key_placeholder: 'Paste your AeroAPI key here…',
+    cfg_status_ok: '● Live data active',
+    cfg_status_none: '● No key — showing schedule',
+    cfg_save: 'Save & Connect',
+    cfg_cancel: 'Cancel',
+    cfg_get_key: 'Get a free AeroAPI key →',
+    cfg_saving: 'Connecting…',
+    cfg_success: '✓ Connected — refreshing data',
+    cfg_error: 'Could not save key. Check server.',
     // Destinations
     dest_title: 'Best Fares to Top <span class="gradient-text">Destinations</span>',
     dest_sub: 'Starting prices in USD — contact us for exact quotes & booking',
@@ -149,20 +169,37 @@ const TRANSLATIONS = {
     about_card3_title: 'Service Personnel',
     about_card3_desc: 'Conseillers de voyage dédiés',
     // Flights
-    flights_title: 'Départs de Vols — <span class="gradient-text">Lubumbashi (FBM)</span>',
-    flights_sub: 'Horaires de départ programmés depuis l\'Aéroport International de Lubumbashi',
+    flights_title: 'Vols en Direct — <span class="gradient-text">Lubumbashi (FBM)</span>',
+    flights_sub: 'Départs et arrivées en temps réel à l\'Aéroport International de Lubumbashi',
     flights_refresh: 'Actualiser',
+    flights_configure: 'Configurer',
+    flights_tab_dep: 'Départs',
+    flights_tab_arr: 'Arrivées',
     flights_loading: 'Chargement des vols…',
-    flights_note: 'Les horaires sont basés sur les programmes publiés des compagnies aériennes. Les horaires réels peuvent varier — contactez-nous pour confirmation.',
+    flights_note: 'Heures affichées en CAT (UTC+2). Données AeroAPI — les horaires réels peuvent varier.',
     flights_header_airline: 'Compagnie / Vol',
-    flights_header_dest: 'Destination',
-    flights_header_dep: 'Départ',
-    flights_header_arr: 'Arrivée (est.)',
+    flights_header_airport: 'Aéroport',
+    flights_header_dep: 'Départ (CAT)',
+    flights_header_arr: 'Arrivée (CAT)',
     flights_header_status: 'Statut',
     flights_upcoming: 'prochains départs',
+    flights_upcoming_arr: 'arrivées prévues',
     flights_fetching: 'Récupération des données…',
     flights_autorefresh: 'Actualisation dans',
     flights_updated: 'Mis à jour',
+    // Configure modal
+    cfg_title: 'Configurer AeroAPI',
+    cfg_subtitle: 'Entrez votre clé AeroAPI FlightAware pour activer les données de vol en direct',
+    cfg_key_label: 'Clé AeroAPI',
+    cfg_key_placeholder: 'Collez votre clé AeroAPI ici…',
+    cfg_status_ok: '● Données en direct actives',
+    cfg_status_none: '● Aucune clé — affichage des horaires',
+    cfg_save: 'Enregistrer & Connecter',
+    cfg_cancel: 'Annuler',
+    cfg_get_key: 'Obtenir une clé AeroAPI gratuite →',
+    cfg_saving: 'Connexion…',
+    cfg_success: '✓ Connecté — actualisation des données',
+    cfg_error: 'Impossible d\'enregistrer la clé. Vérifiez le serveur.',
     // Destinations
     dest_title: 'Meilleurs Tarifs vers les <span class="gradient-text">Destinations</span> Populaires',
     dest_sub: 'Prix de départ en USD — contactez-nous pour un devis exact et une réservation',
@@ -257,12 +294,12 @@ function toggleLanguage() {
   localStorage.setItem('hacsLang', currentLang);
   applyTranslations();
   // Re-render dynamic content
-  renderFlights(lastFlightsData);
+  renderFlights(lastAllFlights);
   renderFares(lastFaresData);
 }
 
 // ═══════════════════════════════════
-//  AIRLINES & ROUTES (REAL SCHEDULES)
+//  AIRLINES & ROUTES (for fare cards)
 // ═══════════════════════════════════
 const AIRLINES = [
   { code: 'ET', name: 'Ethiopian Airlines', flag: '🇪🇹' },
@@ -271,88 +308,6 @@ const AIRLINES = [
   { code: 'WB', name: 'RwandAir',           flag: '🇷🇼' },
   { code: '8Z', name: 'Congo Airways',      flag: '🇨🇩' },
   { code: 'TC', name: 'Air Tanzania',       flag: '🇹🇿' },
-];
-
-// Fixed schedule data based on real airline timetables from FBM
-// These are consistent departure times — not random
-const FBM_SCHEDULE = [
-  {
-    flightNum: 'ET 865',
-    airline: { code: 'ET', name: 'Ethiopian Airlines', flag: '🇪🇹' },
-    route: { code: 'ADD', city: 'Addis Ababa', country: 'Ethiopia', flag: '🇪🇹' },
-    depTime: '05:45', durationMin: 270, baseFare: 290,
-    daysOfWeek: [1, 3, 5, 7] // Mon, Wed, Fri, Sun
-  },
-  {
-    flightNum: 'ET 866',
-    airline: { code: 'ET', name: 'Ethiopian Airlines', flag: '🇪🇹' },
-    route: { code: 'ADD', city: 'Addis Ababa', country: 'Ethiopia', flag: '🇪🇹' },
-    depTime: '22:30', durationMin: 265, baseFare: 310,
-    daysOfWeek: [2, 4, 6] // Tue, Thu, Sat
-  },
-  {
-    flightNum: 'KQ 457',
-    airline: { code: 'KQ', name: 'Kenya Airways', flag: '🇰🇪' },
-    route: { code: 'NBO', city: 'Nairobi', country: 'Kenya', flag: '🇰🇪' },
-    depTime: '11:20', durationMin: 225, baseFare: 270,
-    daysOfWeek: [1, 2, 4, 5, 7] // Mon, Tue, Thu, Fri, Sun
-  },
-  {
-    flightNum: 'SA 047',
-    airline: { code: 'SA', name: 'South African Airways', flag: '🇿🇦' },
-    route: { code: 'JNB', city: 'Johannesburg', country: 'South Africa', flag: '🇿🇦' },
-    depTime: '08:15', durationMin: 250, baseFare: 310,
-    daysOfWeek: [1, 3, 5, 7] // Mon, Wed, Fri, Sun
-  },
-  {
-    flightNum: 'SA 049',
-    airline: { code: 'SA', name: 'South African Airways', flag: '🇿🇦' },
-    route: { code: 'CPT', city: 'Cape Town', country: 'South Africa', flag: '🇿🇦' },
-    depTime: '07:50', durationMin: 340, baseFare: 380,
-    daysOfWeek: [2, 6] // Tue, Sat
-  },
-  {
-    flightNum: 'WB 205',
-    airline: { code: 'WB', name: 'RwandAir', flag: '🇷🇼' },
-    route: { code: 'KGL', city: 'Kigali', country: 'Rwanda', flag: '🇷🇼' },
-    depTime: '14:30', durationMin: 135, baseFare: 210,
-    daysOfWeek: [1, 3, 5] // Mon, Wed, Fri
-  },
-  {
-    flightNum: 'TC 312',
-    airline: { code: 'TC', name: 'Air Tanzania', flag: '🇹🇿' },
-    route: { code: 'DAR', city: 'Dar es Salaam', country: 'Tanzania', flag: '🇹🇿' },
-    depTime: '09:40', durationMin: 205, baseFare: 250,
-    daysOfWeek: [2, 4, 6] // Tue, Thu, Sat
-  },
-  {
-    flightNum: 'ET 343',
-    airline: { code: 'ET', name: 'Ethiopian Airlines', flag: '🇪🇹' },
-    route: { code: 'DXB', city: 'Dubai', country: 'UAE', flag: '🇦🇪' },
-    depTime: '23:15', durationMin: 480, baseFare: 520,
-    daysOfWeek: [1, 3, 5, 7] // via ADD — Mon, Wed, Fri, Sun
-  },
-  {
-    flightNum: 'ET 609',
-    airline: { code: 'ET', name: 'Ethiopian Airlines', flag: '🇪🇹' },
-    route: { code: 'BOM', city: 'Mumbai', country: 'India', flag: '🇮🇳' },
-    depTime: '05:45', durationMin: 620, baseFare: 580,
-    daysOfWeek: [2, 4, 6] // via ADD — Tue, Thu, Sat
-  },
-  {
-    flightNum: 'KQ 310',
-    airline: { code: 'KQ', name: 'Kenya Airways', flag: '🇰🇪' },
-    route: { code: 'KHI', city: 'Karachi', country: 'Pakistan', flag: '🇵🇰' },
-    depTime: '11:20', durationMin: 660, baseFare: 610,
-    daysOfWeek: [1, 4, 7] // via NBO — Mon, Thu, Sun
-  },
-  {
-    flightNum: '8Z 102',
-    airline: { code: '8Z', name: 'Congo Airways', flag: '🇨🇩' },
-    route: { code: 'FIH', city: 'Kinshasa', country: 'DRC', flag: '🇨🇩' },
-    depTime: '06:30', durationMin: 180, baseFare: 190,
-    daysOfWeek: [1, 2, 3, 4, 5, 6, 7] // Daily
-  },
 ];
 
 // ── Route data for destination cards ──
@@ -369,12 +324,32 @@ const ROUTES = [
   { code: 'FIH', city: 'Kinshasa',       country: 'DRC',          flag: '🇨🇩', airlines: ['8Z'],         durationMin: 180, baseFare: 190 },
 ];
 
+// ═══════════════════════════════════
+//  TIMEZONE: UTC → FBM Local (CAT, UTC+2)
+// ═══════════════════════════════════
+const FBM_UTC_OFFSET = 2; // Central Africa Time = UTC+2
+
+/**
+ * Convert a UTC ISO 8601 string to a Date object
+ * adjusted for Lubumbashi local display (CAT, UTC+2).
+ */
+function utcToFBMLocal(isoString) {
+  if (!isoString) return null;
+  const utc = new Date(isoString);
+  // Shift by UTC+2 hours for display purposes
+  return new Date(utc.getTime() + FBM_UTC_OFFSET * 60 * 60 * 1000);
+}
+
 // ── Helpers ──
 function pad(n) { return String(n).padStart(2, '0'); }
-function formatTime(date) { return pad(date.getHours()) + ':' + pad(date.getMinutes()); }
+function formatTime(date) {
+  if (!date || isNaN(date.getTime())) return '--:--';
+  return pad(date.getUTCHours()) + ':' + pad(date.getUTCMinutes());
+}
 function formatDate(date) {
+  if (!date || isNaN(date.getTime())) return '';
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
+  return date.getUTCDate() + ' ' + months[date.getUTCMonth()] + ' ' + date.getUTCFullYear();
 }
 function formatDuration(mins) {
   const h = Math.floor(mins / 60);
@@ -383,110 +358,150 @@ function formatDuration(mins) {
 }
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
+// ── Data source tracking ──
+let lastDataSource = 'none'; // 'api' | 'fallback' | 'error'
+let lastWarning = '';
+
 // ═══════════════════════════════════
-//  FLIGHT SCHEDULE GENERATOR (FIXED TIMES)
+//  CLIENT-SIDE FALLBACK SCHEDULE
+//  Used when the backend is unreachable
 // ═══════════════════════════════════
-// Generates upcoming flights based on the fixed schedule
-function getUpcomingFlights(count) {
+const FBM_FALLBACK_DEPARTURES = [
+  { flightNum: 'ET 865', airline: 'ET', dest: 'ADD', depLocal: '05:45', durationMin: 270, days: [1,3,5,7] },
+  { flightNum: 'ET 866', airline: 'ET', dest: 'ADD', depLocal: '22:30', durationMin: 265, days: [2,4,6]   },
+  { flightNum: 'KQ 457', airline: 'KQ', dest: 'NBO', depLocal: '11:20', durationMin: 225, days: [1,2,4,5,7] },
+  { flightNum: 'SA 047', airline: 'SA', dest: 'JNB', depLocal: '08:15', durationMin: 250, days: [1,3,5,7] },
+  { flightNum: 'SA 049', airline: 'SA', dest: 'CPT', depLocal: '07:50', durationMin: 340, days: [2,6]     },
+  { flightNum: 'WB 205', airline: 'WB', dest: 'KGL', depLocal: '14:30', durationMin: 135, days: [1,3,5]   },
+  { flightNum: 'TC 312', airline: 'TC', dest: 'DAR', depLocal: '09:40', durationMin: 205, days: [2,4,6]   },
+  { flightNum: 'ET 343', airline: 'ET', dest: 'DXB', depLocal: '23:15', durationMin: 480, days: [1,3,5,7] },
+  { flightNum: 'ET 609', airline: 'ET', dest: 'BOM', depLocal: '05:45', durationMin: 620, days: [2,4,6]   },
+  { flightNum: 'KQ 310', airline: 'KQ', dest: 'KHI', depLocal: '11:20', durationMin: 660, days: [1,4,7]   },
+  { flightNum: '8Z 102', airline: '8Z', dest: 'FIH', depLocal: '06:30', durationMin: 180, days: [1,2,3,4,5,6,7] },
+];
+
+const FBM_FALLBACK_ARRIVALS = [
+  { flightNum: 'ET 866', airline: 'ET', orig: 'ADD', arrLocal: '21:40', durationMin: 270, days: [2,4,6]    },
+  { flightNum: 'KQ 458', airline: 'KQ', orig: 'NBO', arrLocal: '13:35', durationMin: 225, days: [1,2,4,5,7] },
+  { flightNum: 'SA 048', airline: 'SA', orig: 'JNB', arrLocal: '10:20', durationMin: 250, days: [1,3,5,7]  },
+  { flightNum: 'SA 050', airline: 'SA', orig: 'CPT', arrLocal: '14:25', durationMin: 340, days: [2,6]      },
+  { flightNum: 'WB 206', airline: 'WB', orig: 'KGL', arrLocal: '16:45', durationMin: 135, days: [1,3,5]    },
+  { flightNum: 'TC 313', airline: 'TC', orig: 'DAR', arrLocal: '11:50', durationMin: 205, days: [2,4,6]    },
+  { flightNum: 'ET 344', airline: 'ET', orig: 'DXB', arrLocal: '09:00', durationMin: 480, days: [1,3,5,7]  },
+  { flightNum: 'ET 865', airline: 'ET', orig: 'ADD', arrLocal: '09:50', durationMin: 270, days: [1,3,5,7]  },
+  { flightNum: '8Z 101', airline: '8Z', orig: 'FIH', arrLocal: '05:10', durationMin: 180, days: [1,2,3,4,5,6,7] },
+];
+
+const DEST_META = {
+  ADD: { city: 'Addis Ababa',   country: 'Ethiopia',     flag: '🇪🇹' },
+  NBO: { city: 'Nairobi',       country: 'Kenya',        flag: '🇰🇪' },
+  JNB: { city: 'Johannesburg',  country: 'South Africa', flag: '🇿🇦' },
+  CPT: { city: 'Cape Town',     country: 'South Africa', flag: '🇿🇦' },
+  KGL: { city: 'Kigali',        country: 'Rwanda',       flag: '🇷🇼' },
+  DAR: { city: 'Dar es Salaam', country: 'Tanzania',     flag: '🇹🇿' },
+  FIH: { city: 'Kinshasa',      country: 'DRC',          flag: '🇨🇩' },
+  DXB: { city: 'Dubai',         country: 'UAE',          flag: '🇦🇪' },
+  BOM: { city: 'Mumbai',        country: 'India',        flag: '🇮🇳' },
+  KHI: { city: 'Karachi',       country: 'Pakistan',     flag: '🇵🇰' },
+};
+
+function generateClientFallbackFlights(type) {
+  const schedule = type === 'arrival' ? FBM_FALLBACK_ARRIVALS : FBM_FALLBACK_DEPARTURES;
   const now = new Date();
   const flights = [];
 
-  // Look ahead up to 3 days to find enough flights
-  for (let dayOffset = 0; dayOffset < 3 && flights.length < count; dayOffset++) {
+  for (let dayOffset = 0; dayOffset < 3 && flights.length < 10; dayOffset++) {
     const checkDate = new Date(now);
     checkDate.setDate(checkDate.getDate() + dayOffset);
-    const dayOfWeek = checkDate.getDay() || 7; // Convert Sunday=0 to 7
+    const dayOfWeek = checkDate.getDay() || 7;
 
-    for (const sched of FBM_SCHEDULE) {
-      if (!sched.daysOfWeek.includes(dayOfWeek)) continue;
+    for (const sched of schedule) {
+      if (!sched.days.includes(dayOfWeek)) continue;
 
-      const [hh, mm] = sched.depTime.split(':').map(Number);
-      const dep = new Date(checkDate);
-      dep.setHours(hh, mm, 0, 0);
+      const timeStr = type === 'arrival' ? sched.arrLocal : sched.depLocal;
+      const [hh, mm] = timeStr.split(':').map(Number);
+      // CAT (UTC+2) → UTC: subtract 2 hours
+      const pivotUTC = new Date(Date.UTC(
+        checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate(),
+        hh - 2, mm, 0
+      ));
 
-      // Skip flights that departed more than 30 min ago
-      if (dep.getTime() < now.getTime() - 30 * 60000) continue;
+      if (pivotUTC.getTime() < now.getTime() - 30 * 60000) continue;
 
-      const arr = new Date(dep.getTime() + sched.durationMin * 60000);
+      const depUTC = type === 'arrival'
+        ? new Date(pivotUTC.getTime() - sched.durationMin * 60000)
+        : pivotUTC;
+      const arrUTC = type === 'arrival'
+        ? pivotUTC
+        : new Date(pivotUTC.getTime() + sched.durationMin * 60000);
 
-      // Determine status based on time until departure
-      const minsUntilDep = (dep.getTime() - now.getTime()) / 60000;
+      const airlineMeta = AIRLINES.find(a => a.code === sched.airline) || { code: sched.airline, name: sched.airline, flag: '✈️' };
+      const aptCode = type === 'arrival' ? sched.orig : sched.dest;
+      const destMeta = DEST_META[aptCode] || {};
+
+      const minsUntilPivot = (pivotUTC.getTime() - now.getTime()) / 60000;
       let status;
-      if (minsUntilDep < 0) {
-        status = { label: 'Departed', cls: 'status--scheduled' };
-      } else if (minsUntilDep <= 30) {
-        status = { label: 'Boarding', cls: 'status--boarding' };
-      } else if (minsUntilDep <= 120) {
-        status = { label: 'On Time', cls: 'status--ontime' };
-      } else {
-        status = { label: 'Scheduled', cls: 'status--scheduled' };
-      }
+      if (minsUntilPivot < 0)    status = type === 'arrival' ? 'landed' : 'departed';
+      else if (minsUntilPivot <= 30) status = type === 'arrival' ? 'approaching' : 'boarding';
+      else status = 'scheduled';
 
       flights.push({
-        airline: sched.airline,
-        flightNum: sched.flightNum,
-        route: sched.route,
-        dep,
-        arr,
-        status
+        type,
+        airline: { iata: sched.airline, icao: '', name: airlineMeta.name, flag: airlineMeta.flag },
+        flightNumber: sched.flightNum,
+        airport: { iata: aptCode, city: destMeta.city || aptCode, country: destMeta.country || '', flag: destMeta.flag || '🌍' },
+        departure: { scheduledUTC: depUTC.toISOString(), estimatedUTC: null },
+        arrival:   { scheduledUTC: arrUTC.toISOString(), estimatedUTC: null },
+        status,
+        aircraft: '',
+        gate: '',
       });
 
-      if (flights.length >= count) break;
+      if (flights.length >= 10) break;
     }
   }
 
-  flights.sort((a, b) => a.dep - b.dep);
-  return flights.slice(0, count);
+  flights.sort((a, b) => new Date(a.departure.scheduledUTC) - new Date(b.departure.scheduledUTC));
+  return flights.slice(0, 10);
 }
 
 // ═══════════════════════════════════
-//  AVIATIONSTACK API (OPTIONAL)
+//  FETCH FLIGHTS FROM BACKEND
 // ═══════════════════════════════════
-async function fetchLiveFlights() {
-  if (!AVIATIONSTACK_API_KEY) return null;
+async function fetchFlightsFromBackend() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
 
   try {
-    const url = `https://api.aviationstack.com/v1/flights?access_key=${encodeURIComponent(AVIATIONSTACK_API_KEY)}&dep_iata=FBM&flight_status=active,scheduled&limit=10`;
-    const resp = await fetch(url);
-    if (!resp.ok) return null;
-    const data = await resp.json();
+    const resp = await fetch(FLIGHTS_API_ENDPOINT, { signal: controller.signal });
+    clearTimeout(timeout);
 
-    if (!data.data || !data.data.length) return null;
+    if (!resp.ok) {
+      throw new Error(`Server responded ${resp.status}`);
+    }
 
-    return data.data.map(f => {
-      const dep = new Date(f.departure?.scheduled || Date.now());
-      const arr = new Date(f.arrival?.scheduled || dep.getTime() + 180 * 60000);
-      const airlineCode = f.airline?.iata || '??';
-      const airline = AIRLINES.find(a => a.code === airlineCode) || { code: airlineCode, name: f.airline?.name || airlineCode, flag: '✈️' };
+    const json = await resp.json();
 
-      let statusLabel = f.flight_status || 'scheduled';
-      let statusCls = 'status--scheduled';
-      if (statusLabel === 'active' || statusLabel === 'en-route') {
-        statusLabel = 'Departed'; statusCls = 'status--ontime';
-      } else if (statusLabel === 'landed') {
-        statusLabel = 'Landed'; statusCls = 'status--ontime';
-      } else if (statusLabel === 'scheduled') {
-        statusLabel = 'Scheduled'; statusCls = 'status--scheduled';
-      } else if (statusLabel === 'delayed') {
-        statusLabel = 'Delayed'; statusCls = 'status--delayed';
-      }
+    if (!json.success) {
+      throw new Error('Server returned error');
+    }
 
-      return {
-        airline,
-        flightNum: f.flight?.iata || airlineCode + '???',
-        route: {
-          code: f.arrival?.iata || '???',
-          city: f.arrival?.airport || 'Unknown',
-          country: '',
-          flag: '🌍'
-        },
-        dep,
-        arr,
-        status: { label: statusLabel, cls: statusCls }
-      };
-    }).sort((a, b) => a.dep - b.dep);
-  } catch {
-    return null;
+    lastDataSource = json.source || 'aeroapi';
+    lastWarning = json.warning || '';
+
+    return {
+      departures: json.departures || [],
+      arrivals:   json.arrivals   || [],
+    };
+  } catch (err) {
+    clearTimeout(timeout);
+    console.warn('[flights] Backend unreachable, using client-side schedule:', err.message);
+    lastDataSource = 'fallback';
+    lastWarning = 'Live data unavailable — showing published schedule';
+    return {
+      departures: generateClientFallbackFlights('departure'),
+      arrivals:   generateClientFallbackFlights('arrival'),
+    };
   }
 }
 
@@ -511,7 +526,7 @@ function generateFares() {
 // ═══════════════════════════════════
 //  RENDER FUNCTIONS
 // ═══════════════════════════════════
-let lastFlightsData = [];
+let lastAllFlights = { departures: [], arrivals: [] };
 let lastFaresData = [];
 
 function renderFlightSkeletons() {
@@ -547,21 +562,68 @@ function renderDestSkeletons() {
   }
 }
 
-function renderFlights(flights) {
-  if (!flights || !flights.length) return;
-  lastFlightsData = flights;
+function renderFlights(allData) {
+  if (!allData) return;
+  lastAllFlights = allData;
+  renderFlightsForTab(activeTab);
+}
 
+function renderFlightsForTab(tab) {
+  activeTab = tab;
+  const flights = lastAllFlights[tab] || [];
+
+  // Update tab active state
+  document.querySelectorAll('.flight-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+
+  if (!flights.length) {
+    renderFlightError();
+    return;
+  }
+
+  const isArr = tab === 'arrivals';
   const board = document.getElementById('flightBoard');
   board.innerHTML = `
     <div class="flight-header">
       <span>${t('flights_header_airline')}</span>
-      <span>${t('flights_header_dest')}</span>
-      <span>${t('flights_header_dep')}</span>
-      <span>${t('flights_header_arr')}</span>
+      <span>${t('flights_header_airport')}</span>
+      <span>${isArr ? t('flights_header_arr') : t('flights_header_dep')}</span>
+      <span>${isArr ? t('flights_header_dep') : t('flights_header_arr')}</span>
       <span>${t('flights_header_status')}</span>
     </div>`;
 
   flights.forEach((f, i) => {
+    // Convert UTC timestamps to Lubumbashi local (CAT, UTC+2) for display
+    const depLocal = utcToFBMLocal(f.departure.estimatedUTC || f.departure.scheduledUTC);
+    const arrLocal = utcToFBMLocal(f.arrival.estimatedUTC  || f.arrival.scheduledUTC);
+
+    // For arrivals the "primary" time shown first is the arrival time
+    const primaryLocal   = isArr ? arrLocal : depLocal;
+    const secondaryLocal = isArr ? depLocal : arrLocal;
+
+    const statusMap = {
+      'scheduled':   { label: 'Scheduled',   cls: 'status--scheduled' },
+      'on-time':     { label: 'On Time',      cls: 'status--ontime'    },
+      'boarding':    { label: 'Boarding',     cls: 'status--boarding'  },
+      'departed':    { label: 'Departed',     cls: 'status--scheduled' },
+      'delayed':     { label: 'Delayed',      cls: 'status--delayed'   },
+      'cancelled':   { label: 'Cancelled',    cls: 'status--delayed'   },
+      'landed':      { label: 'Landed',       cls: 'status--ontime'    },
+      'approaching': { label: 'Approaching',  cls: 'status--boarding'  },
+    };
+    const st = statusMap[f.status] || statusMap['scheduled'];
+
+    const hasEstimate = (isArr ? f.arrival.estimatedUTC : f.departure.estimatedUTC);
+
+    // Direction badge
+    const dirBadge = isArr
+      ? `<span class="flight-dir flight-dir--arr">▼ ARR</span>`
+      : `<span class="flight-dir flight-dir--dep">▲ DEP</span>`;
+
+    const aptInfo = f.airport || f.destination || {};
+    const gateInfo = f.gate ? `<div class="flight-row__gate">Gate ${f.gate}</div>` : '';
+
     const row = document.createElement('div');
     row.className = 'flight-row';
     row.style.animationDelay = (i * 0.05) + 's';
@@ -569,28 +631,64 @@ function renderFlights(flights) {
       <div class="flight-row__airline">
         <span class="flight-row__airline-flag">${f.airline.flag}</span>
         <div>
-          <div class="flight-row__code">${f.flightNum}</div>
+          <div class="flight-row__code">${dirBadge} ${f.flightNumber}</div>
           <div class="flight-row__name">${f.airline.name}</div>
         </div>
       </div>
       <div class="flight-row__dest">
-        <div class="flight-row__city">${f.route.city}</div>
-        <div class="flight-row__iata">FBM → ${f.route.code}</div>
+        <div class="flight-row__city">${aptInfo.city || aptInfo.iata || '—'}</div>
+        <div class="flight-row__iata">${isArr ? (aptInfo.iata || '') + ' → FBM' : 'FBM → ' + (aptInfo.iata || '')}</div>
+        ${gateInfo}
       </div>
       <div class="flight-row__time">
-        <div class="flight-row__time-val">${formatTime(f.dep)}</div>
-        <div class="flight-row__time-label">${formatDate(f.dep)}</div>
+        <div class="flight-row__time-val">${formatTime(primaryLocal)}${hasEstimate ? ' *' : ''}</div>
+        <div class="flight-row__time-label">${formatDate(primaryLocal)} CAT</div>
       </div>
       <div class="flight-row__time">
-        <div class="flight-row__time-val">${formatTime(f.arr)}</div>
-        <div class="flight-row__time-label">${formatDate(f.arr)}</div>
+        <div class="flight-row__time-val">${formatTime(secondaryLocal)}</div>
+        <div class="flight-row__time-label">${formatDate(secondaryLocal)}</div>
       </div>
-      <div class="flight-row__status ${f.status.cls}">${f.status.label}</div>`;
+      <div class="flight-row__status ${st.cls}">${st.label}</div>`;
     board.appendChild(row);
   });
 
-  document.getElementById('flightStatus').textContent = `${flights.length} ${t('flights_upcoming')}`;
-  document.getElementById('lastUpdated').textContent = t('flights_updated') + ' ' + formatTime(new Date());
+  const countKey = isArr ? 'flights_upcoming_arr' : 'flights_upcoming';
+  document.getElementById('flightStatus').textContent = `${flights.length} ${t(countKey)}`;
+  const nowCAT = utcToFBMLocal(new Date().toISOString());
+  document.getElementById('lastUpdated').textContent = t('flights_updated') + ' ' + formatTime(nowCAT) + ' CAT';
+  updateDataSourceBadge();
+}
+
+function renderFlightError() {
+  const board = document.getElementById('flightBoard');
+  board.innerHTML = `
+    <div class="flights__error">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <p>${currentLang === 'fr' ? 'Données de vol indisponibles' : 'Flight data unavailable'}</p>
+      <p style="opacity:0.6;font-size:0.85rem">${currentLang === 'fr' ? 'Réessayez dans quelques instants' : 'Please try again shortly'}</p>
+    </div>`;
+  document.getElementById('flightStatus').textContent = currentLang === 'fr' ? 'Hors ligne' : 'Offline';
+  updateDataSourceBadge();
+}
+
+function updateDataSourceBadge() {
+  const el = document.getElementById('dataSourceBadge');
+  if (!el) return;
+
+  const badges = {
+    fr24:     { text: '● LIVE', cls: 'data-badge--live' },
+    aeroapi:  { text: '● LIVE', cls: 'data-badge--live' },
+    api:      { text: '● LIVE', cls: 'data-badge--live' },
+    fallback: { text: '● SCHEDULE', cls: 'data-badge--fallback' },
+    error:    { text: '● OFFLINE', cls: 'data-badge--error' },
+    none:     { text: '', cls: '' },
+  };
+  const b = badges[lastDataSource] || badges.none;
+  el.textContent = b.text;
+  el.className = 'data-source-badge ' + b.cls;
+  el.title = lastWarning || '';
 }
 
 function renderFares(fares) {
@@ -647,15 +745,8 @@ async function loadFlights() {
   renderFlightSkeletons();
   document.getElementById('flightStatus').textContent = t('flights_fetching');
 
-  // Try live API first, fall back to schedule
-  let flights = await fetchLiveFlights();
-  if (!flights) {
-    // Small delay to show loading state
-    await new Promise(r => setTimeout(r, 400));
-    flights = getUpcomingFlights(8);
-  }
-
-  renderFlights(flights);
+  const allData = await fetchFlightsFromBackend();
+  renderFlights(allData);
 }
 
 async function loadFares() {
@@ -768,8 +859,113 @@ function initReveal() {
 }
 
 // ═══════════════════════════════════
-//  REFRESH BUTTON
+//  CONFIGURE MODAL
 // ═══════════════════════════════════
+function openConfigureModal() {
+  const modal = document.getElementById('configureModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Pre-fill saved key from localStorage (display only — not the real key)
+  const keyInput = document.getElementById('aeroApiKeyInput');
+  if (keyInput) keyInput.value = '';
+  // Check current status
+  fetch('/api/health').then(r => r.json()).then(data => {
+    const statusEl = document.getElementById('cfgStatusText');
+    if (statusEl) {
+      statusEl.textContent = data.keyConfigured ? t('cfg_status_ok') : t('cfg_status_none');
+      statusEl.className   = 'cfg-status ' + (data.keyConfigured ? 'cfg-status--ok' : 'cfg-status--none');
+    }
+  }).catch(() => {});
+}
+
+function closeConfigureModal() {
+  const modal = document.getElementById('configureModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function saveAeroApiKey() {
+  const keyInput = document.getElementById('aeroApiKeyInput');
+  const saveBtn  = document.getElementById('cfgSaveBtn');
+  const feedback = document.getElementById('cfgFeedback');
+  if (!keyInput || !saveBtn) return;
+
+  const key = keyInput.value.trim();
+  saveBtn.textContent = t('cfg_saving');
+  saveBtn.disabled = true;
+  if (feedback) feedback.textContent = '';
+
+  try {
+    const resp = await fetch(CONFIGURE_API_ENDPOINT, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ aeroApiKey: key }),
+    });
+    const data = await resp.json();
+
+    if (data.success) {
+      if (feedback) {
+        feedback.textContent = t('cfg_success');
+        feedback.className = 'cfg-feedback cfg-feedback--ok';
+      }
+      // Close modal after 1.2s then refresh
+      setTimeout(() => {
+        closeConfigureModal();
+        refreshAll().then(() => startAutoRefresh());
+      }, 1200);
+    } else {
+      throw new Error(data.error || 'Save failed');
+    }
+  } catch (err) {
+    if (feedback) {
+      feedback.textContent = t('cfg_error');
+      feedback.className = 'cfg-feedback cfg-feedback--err';
+    }
+    saveBtn.disabled = false;
+    saveBtn.textContent = t('cfg_save');
+  }
+}
+
+function initConfigureModal() {
+  const openBtn  = document.getElementById('openConfigure');
+  const closeBtn = document.getElementById('cfgCloseBtn');
+  const cancelBtn = document.getElementById('cfgCancelBtn');
+  const saveBtn  = document.getElementById('cfgSaveBtn');
+  const overlay  = document.getElementById('configureModal');
+
+  if (openBtn)   openBtn.addEventListener('click', openConfigureModal);
+  if (closeBtn)  closeBtn.addEventListener('click', closeConfigureModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeConfigureModal);
+  if (saveBtn)   saveBtn.addEventListener('click', saveAeroApiKey);
+
+  // Close on overlay click
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeConfigureModal();
+    });
+  }
+
+  // Enter key submits
+  const keyInput = document.getElementById('aeroApiKeyInput');
+  if (keyInput) {
+    keyInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') saveAeroApiKey();
+    });
+  }
+}
+
+// ═══════════════════════════════════
+//  FLIGHT TABS
+// ═══════════════════════════════════
+function initFlightTabs() {
+  document.querySelectorAll('.flight-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      renderFlightsForTab(btn.dataset.tab);
+    });
+  });
+}
 function initRefresh() {
   const btn = document.getElementById('refreshFlights');
   btn.addEventListener('click', async () => {
@@ -855,6 +1051,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initNav();
   initReveal();
   initRefresh();
+  initFlightTabs();
+  initConfigureModal();
   initForm();
   initSmoothScroll();
   initLangToggle();

@@ -273,15 +273,57 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
    FLIGHT BOARD
    ══════════════ */
 .flights { background: var(--bg-alt); }
-.flights__controls { display: flex; align-items: center; gap: 10px; }
-.airport-select {
+.flights__controls { display: flex; align-items: center; gap: 8px; }
+
+/* Configure button */
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 14px; border-radius: var(--radius-xs);
-  background: var(--bg-card); border: 1px solid var(--glass-border);
-  color: var(--text); font-family: var(--font-body); font-size: 0.82rem;
-  cursor: pointer; outline: none;
+  font-size: 0.82rem; font-weight: 500; cursor: pointer;
   transition: var(--transition);
 }
-.airport-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(40,86,163,0.1); }
+.btn--ghost:hover {
+  border-color: var(--blue); color: var(--blue);
+  background: rgba(40,86,163,0.05);
+}
+
+/* Flight tabs */
+.flight-tabs {
+  display: flex; gap: 4px; margin-bottom: 18px;
+  background: var(--bg-card); padding: 4px; border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border); width: fit-content;
+}
+.flight-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 20px; border-radius: calc(var(--radius-sm) - 2px);
+  border: none; background: transparent; cursor: pointer;
+  font-family: var(--font-body); font-size: 0.82rem; font-weight: 600;
+  color: var(--text-muted); transition: var(--transition);
+}
+.flight-tab:hover { color: var(--text); background: rgba(40,86,163,0.05); }
+.flight-tab.active {
+  background: var(--blue); color: #fff;
+  box-shadow: 0 2px 8px rgba(40,86,163,0.25);
+}
+
+/* Direction badge inside flight row */
+.flight-dir {
+  display: inline-block; font-size: 0.58rem; font-weight: 700;
+  padding: 1px 5px; border-radius: 3px; vertical-align: middle;
+  margin-right: 3px; letter-spacing: 0.3px;
+}
+.flight-dir--dep { background: rgba(40,86,163,0.1); color: var(--blue); }
+.flight-dir--arr { background: rgba(15,169,104,0.1); color: var(--green); }
+
+/* Gate label */
+.flight-row__gate {
+  font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;
+  background: var(--bg-secondary); padding: 1px 6px; border-radius: 3px;
+  display: inline-block;
+}
 
 .flights__status {
   display: flex; align-items: center; gap: 8px;
@@ -294,6 +336,22 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
   font-size: 0.72rem; color: var(--blue);
   padding: 3px 10px; border-radius: 50px;
   background: rgba(40,86,163,0.06);
+}
+
+/* ── Data source badge ── */
+.data-source-badge {
+  font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+  padding: 2px 10px; border-radius: 50px; letter-spacing: 0.5px;
+}
+.data-badge--live { color: #0fa968; background: rgba(15,169,104,0.1); }
+.data-badge--fallback { color: var(--orange); background: rgba(232,152,42,0.1); }
+.data-badge--error { color: var(--red); background: rgba(217,68,82,0.1); }
+
+/* ── Flight error state ── */
+.flights__error {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px 24px; text-align: center; color: var(--text-muted);
+  gap: 8px;
 }
 .pulse-dot {
   width: 8px; height: 8px; border-radius: 50%;
@@ -641,6 +699,98 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 .whatsapp-float:hover .whatsapp-float__tooltip {
   opacity: 1; transform: translateY(-50%) translateX(0);
 }
+
+/* ══════════════════════════
+   CONFIGURE MODAL
+   ══════════════════════════ */
+.cfg-modal {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(10,18,30,0.72); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.cfg-modal.open {
+  opacity: 1; pointer-events: all;
+}
+.cfg-modal__panel {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+  padding: 36px 40px 32px;
+  width: 100%; max-width: 440px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px;
+  transform: scale(0.94) translateY(12px);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.cfg-modal.open .cfg-modal__panel {
+  transform: scale(1) translateY(0);
+}
+.cfg-modal__close {
+  position: absolute; top: 14px; right: 14px;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); padding: 6px; border-radius: 50%;
+  transition: var(--transition);
+}
+.cfg-modal__close:hover { background: var(--bg-secondary); color: var(--text); }
+.cfg-modal__logo {
+  width: 56px; height: 56px; border-radius: 14px;
+  background: rgba(40,86,163,0.08); border: 1px solid rgba(40,86,163,0.15);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--blue);
+}
+.cfg-modal__title {
+  font-family: var(--font-display); font-size: 1.25rem;
+  font-weight: 700; color: var(--text); text-align: center;
+  margin: 0;
+}
+.cfg-modal__subtitle {
+  font-size: 0.84rem; color: var(--text-muted); text-align: center;
+  line-height: 1.5; margin: 0;
+}
+.cfg-status {
+  font-size: 0.75rem; font-weight: 600; padding: 5px 14px;
+  border-radius: 50px; letter-spacing: 0.3px;
+}
+.cfg-status--ok   { background: rgba(15,169,104,0.1); color: var(--green); }
+.cfg-status--none { background: rgba(232,152,42,0.1); color: var(--orange); }
+.cfg-modal__field {
+  width: 100%; display: flex; flex-direction: column; gap: 6px;
+}
+.cfg-modal__field label {
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.cfg-modal__input {
+  width: 100%; padding: 11px 14px; border-radius: var(--radius-xs);
+  border: 1.5px solid var(--glass-border);
+  background: var(--bg-secondary); color: var(--text);
+  font-family: 'Courier New', monospace; font-size: 0.85rem;
+  outline: none; transition: var(--transition);
+  box-sizing: border-box;
+}
+.cfg-modal__input:focus {
+  border-color: var(--blue); box-shadow: 0 0 0 3px rgba(40,86,163,0.12);
+}
+.cfg-modal__input::placeholder { color: var(--text-dim); }
+.cfg-modal__actions {
+  display: flex; gap: 10px; width: 100%; margin-top: 4px;
+}
+.cfg-modal__actions .btn { flex: 1; justify-content: center; text-align: center; }
+.cfg-feedback {
+  font-size: 0.8rem; font-weight: 500; min-height: 20px;
+  transition: var(--transition);
+}
+.cfg-feedback--ok  { color: var(--green); }
+.cfg-feedback--err { color: var(--red); }
+.cfg-modal__link {
+  font-size: 0.78rem; color: var(--blue); text-decoration: none;
+  font-weight: 500; transition: var(--transition);
+}
+.cfg-modal__link:hover { color: var(--blue-light); text-decoration: underline; }
 
 /* ══════════════
    FOOTER
