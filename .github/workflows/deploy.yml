@@ -24,3 +24,5 @@ jobs:
             **/.git*
             **/.git*/**
             .github/**
+            node_modules/**
+            hacs-deploy-files.zip
